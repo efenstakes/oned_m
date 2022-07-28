@@ -33,6 +33,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   Task _task = Task( tags: [], project: "Learner" );
 
 
+  bool _isLoading = false;
+
+  String _error = "";
+
 
   @override
   Widget build(BuildContext context) {
@@ -276,6 +280,27 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 60),
 
+
+
+              (_error == "" )
+                ? Container()
+                : 
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 20
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20, horizontal: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow[200],
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Text(_error),
+                  ),
+
+
+
               // add button
               FloatingActionButton.extended(
                 elevation: 0,
@@ -292,8 +317,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   print("form can submit");
                   print(_task);
 
+
                 }, 
-                label: Text("Add Button"),
+                label: Text(
+                  _isLoading ? "Adding Task" : "Add Task"
+                ),
+                icon: _isLoading ? const CircularProgressIndicator() : null,
               ),
 
               const SizedBox(height: 80),
