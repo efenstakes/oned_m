@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -104,6 +105,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
 
                   print("form can submit");
+
+                  try {
+                    FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: _emailInputController.text.trim(), 
+                      password: _passwordInputController.text.trim()
+                    );
+                  } catch(e) {
+                    print("could not login ${e.toString()}");
+                  }
 
                 }, 
                 label: Text("Login"),

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _formKey = GlobalKey<FormState>();
 
 
-  final TextEditingController _nameInputController = TextEditingController();
+  // final TextEditingController _nameInputController = TextEditingController();
   final TextEditingController _emailInputController = TextEditingController();
   final TextEditingController _passwordInputController = TextEditingController();
 
@@ -53,24 +54,24 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               const SizedBox(height: 40),
 
               // name
-              TextFormField(
-                controller: _nameInputController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter Name',
-                  prefixIcon: Icon(Icons.person),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter name';
-                  }
-                  return null;
-                },
-                onSaved: (val)=> setState(() {
+              // TextFormField(
+              //   controller: _nameInputController,
+              //   decoration: const InputDecoration(
+              //     border: UnderlineInputBorder(),
+              //     labelText: 'Enter Name',
+              //     prefixIcon: Icon(Icons.person),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter name';
+              //     }
+              //     return null;
+              //   },
+              //   onSaved: (val)=> setState(() {
                   
-                }),
-              ),
-              const SizedBox(height: 40),
+              //   }),
+              // ),
+              // const SizedBox(height: 40),
 
               // Email
               TextFormField(
@@ -127,8 +128,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     print("form error ");
                     return;
                   }
-
-                  print("form can submit");
+                  
+                  try {
+                    FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      email: _emailInputController.text.trim(), 
+                      password: _passwordInputController.text.trim()
+                    );
+                  } catch (e) {
+                    print("error ${e.toString()}");
+                  }
 
                 }, 
                 label: Text("Create Account"),
