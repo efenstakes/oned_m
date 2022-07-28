@@ -1,9 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
+import 'package:oned_m/widgets/stat_card.widget.dart';
+import 'package:oned_m/widgets/task.widget.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,11 +27,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text("Home"),
-      //   centerTitle: true,
-      //   elevation: 0,
-      // ),
+      appBar: AppBar(
+        title: null,
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            onPressed: ()=> _logOut(), 
+            icon: const Icon(Icons.logout_outlined),
+            color: Colors.black87,
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
@@ -148,161 +161,10 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
-}
 
-class StatCardWidget extends StatelessWidget {
-  String title;
-  int stat;
-  Color backgroundColor;
+  
 
-  StatCardWidget({
-    Key? key,
-    required this.title,
-    required this.stat,
-    required this.backgroundColor,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      color: backgroundColor,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 20,
-        ),
-        constraints: const BoxConstraints(minWidth: 120),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium!,
-            ),
-            
-            Text(
-              stat.toString(),
-              style: Theme.of(context).textTheme.headline3!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class TaskWidget extends StatefulWidget {
-  final Task task;
-
-  const TaskWidget({Key? key, required this.task}) : super(key: key);
-
-  @override
-  State<TaskWidget> createState() => _TaskWidgetState();
-}
-
-class _TaskWidgetState extends State<TaskWidget> {
-  @override
-  Widget build(BuildContext context) {
-    Color? color = Colors.green[900];
-
-    if( widget.task.progress > 0 ) {
-      color = Colors.blue[400];
-    } 
-    if( widget.task.progress != 100 && Jiffy(widget.task.deadline).isBefore(Jiffy()) ) {
-      color = Colors.orange[300];
-    }
-
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        constraints: const BoxConstraints(
-          maxHeight: 200,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // title and done status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.task.title!,
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: color,
-                  ),
-                )
-              ],
-            ),
-
-            // description
-            Text(
-              widget.task.description!,
-              style: Theme.of(context).textTheme.bodyMedium,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
-
-            const Spacer(),
-
-            // actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                FloatingActionButton(
-                  onPressed: () {},
-                  child: const Icon(Icons.delete_outline_outlined),
-                  mini: true,
-                  elevation: 0,
-                  key: Key("delete"),
-                  backgroundColor: Colors.red[600],
-                ),
-                FloatingActionButton(
-                  onPressed: () {},
-                  child: const Icon(Icons.edit_attributes_outlined),
-                  mini: true,
-                  elevation: 0,
-                  key: Key("edit"),
-                  backgroundColor: Colors.black54,
-                ),
-                FloatingActionButton(
-                  onPressed: () {},
-                  child: const Icon(Icons.query_stats),
-                  mini: true,
-                  elevation: 0,
-                  key: Key("set status"),
-                  backgroundColor: Colors.greenAccent[800],
-                ),
-                FloatingActionButton(
-                  onPressed: () {},
-                  child: const Icon(Icons.done_all),
-                  mini: true,
-                  elevation: 0,
-                  key: Key("done"),
-                  backgroundColor: Colors.green[800],
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
+  Future<void> _logOut() async {
+    FirebaseAuth.instance.signOut();
   }
 }
