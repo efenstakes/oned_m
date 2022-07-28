@@ -29,6 +29,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   bool _isLoading = false;
 
+  String _error = "";
+
 
   @override
   Widget build(BuildContext context) {
@@ -117,34 +119,30 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               ),
               const SizedBox(height: 40),
 
+              (_error == "" )
+                ? Container()
+                : 
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow[200],
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Text(_error),
+                  ),
+
 
               // add button
               FloatingActionButton.extended(
                 elevation: 0,
                 focusElevation: 0,
                 hoverElevation: 0,
-                onPressed: (){
-                  _formKey.currentState!.save();
-
-                  if( !_formKey.currentState!.validate() ) {
-                    print("form error ");
-                    return;
-                  }
-                  
-                  setState(()=> _isLoading = true);
-
-                  try {
-                    FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: _emailInputController.text.trim(), 
-                      password: _passwordInputController.text.trim()
-                    );
-                  } catch (e) {
-                    print("error ${e.toString()}");
-                  }
-
-                  setState(()=> _isLoading = true);
-                }, 
-                label: Text("Create Account"),
+                onPressed: _register, 
+                label: Text(
+                  _isLoading ? "Creating Account" : "Create Account"
+                ),
+                icon: _isLoading ? CircularProgressIndicator() : null,
               ),
               const SizedBox(height: 20),
               TextButton(onPressed: ()=> widget.switchPage(), child: Text("Have an Account? Login"),),
@@ -156,5 +154,51 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         ),
       ),
     );
+  }
+
+  _register () async {
+    _formKey.currentState!.save();
+
+    if( !_formKey.currentState!.validate() ) {
+      print("form error ");
+      return;
+    }
+    
+    setState(() {
+      _isLoading = true;
+      _error = "";
+    });
+
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailInputController.text.trim(), 
+        password: _passwordInputController.text.trim()
+      );
+    } on FirebaseAuthException catch (e) {
+      print("error ${e.toString()}");
+
+      switch (e.code) {
+        case "email-already-in-use":
+          setState(()=> _error = "Email already chosen");
+          break;
+
+        case "invalid-email":
+          setState(()=> _error = "Invalid email");
+          break;
+          
+        case "operation-not-allowed":
+          setState(()=> _error = "Server error");
+          break;
+          
+        case "weak-password":
+          setState(()=> _error = "Password should be stronger");
+          break;
+
+        default:
+      }
+
+    }
+
+    setState(()=> _isLoading = true);
   }
 }
