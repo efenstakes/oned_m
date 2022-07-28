@@ -85,22 +85,22 @@ class _HomeScreenState extends State<HomeScreen> {
               spacing: 10,
               children: [
                 StatCardWidget(
-                  stat: 5,
+                  stat: _tasks.where((t) => t.progress == 100).length,
                   title: "Done",
                   backgroundColor: Colors.green,
                 ),
                 StatCardWidget(
-                  stat: 2,
+                  stat: _tasks.where((t) => t.progress < 100).length,
                   title: "In Progress",
                   backgroundColor: Colors.blue,
                 ),
                 StatCardWidget(
-                  stat: 7,
+                  stat: _tasks.where((t) => Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1))).length,
                   title: "Timing Out",
                   backgroundColor: Colors.yellow,
                 ),
                 StatCardWidget(
-                  stat: 0,
+                  stat: _tasks.where((t) => Jiffy(t.deadline).isAfter(Jiffy())).length,
                   title: "Late",
                   backgroundColor: Colors.red,
                 ),
@@ -249,9 +249,9 @@ class _HomeScreenState extends State<HomeScreen> {
         .where(
           'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
         )
-        .where(
-          "progress", isLessThan: 100,
-        )
+        // .where(
+        //   "progress", isLessThan: 100,
+        // )
         .snapshots()
         .listen((snapshot) {
           
