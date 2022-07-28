@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -341,7 +342,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     try {
       var taskRef = FirebaseFirestore.instance.collection("tasks").doc();
 
-      await taskRef.set(_task.toMap());
+      await taskRef.set({
+        ..._task.toMap(),
+        'user': FirebaseAuth.instance.currentUser?.uid,
+      });
     } catch(e) {
       setState(()=> _error = "Error adding task");
     }
