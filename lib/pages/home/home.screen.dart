@@ -1,9 +1,13 @@
+import 'dart:ui';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
+import 'package:oned_m/pages/add_task/add_task.screen.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
@@ -19,6 +23,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _selectedTag = "All";
+
+  List<Task> _tasks = [];
+  List<String> _tags = [
+    "All"
+  ];
+  List<String> _projects = [
+    "All"
+  ];
+
+  int _done = 0;
+  int _inProgress = 0;
+  int _late = 0;
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _getTasks();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,44 +110,94 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 60),
 
-            // tags
-            Wrap(
-              alignment: WrapAlignment.center,
-              runSpacing: 10,
-              spacing: 10,
-              children: [
-                ...["Proj 1", "proj #2", "proj #3", "proj #4", "proj #5"]
-                    .map((e) {
-                  return InkWell(
-                    onTap: () => setState(() {
-                      _selectedTag = e;
-                    }),
-                    child: Chip(
-                      label: Text(e),
-                      labelStyle: TextStyle(
-                        color:
-                            _selectedTag != e ? Colors.black87 : Colors.white,
+            // _projects
+            ( _projects.length > 1 ) 
+              ?
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  runSpacing: 10,
+                  spacing: 10,
+                  children: [
+                    ..._projects.map((e) {
+                      return InkWell(
+                        onTap: () => setState(() {
+                          _selectedTag = e;
+                        }),
+                        child: Chip(
+                          label: Text(e),
+                          labelStyle: TextStyle(
+                            color:
+                                _selectedTag != e ? Colors.black87 : Colors.white,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 9,
+                            horizontal: 16,
+                          ),
+                          backgroundColor: _selectedTag == e
+                              ? Colors.black87
+                              : Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                                color: _selectedTag == e
+                                    ? Colors.transparent
+                                    : Colors.black87,
+                                width: _selectedTag == e ? 0 : 1),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                )
+              : Container(),
+
+
+            ( _tasks.isEmpty ) 
+              ?
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 120
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20, horizontal: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.brown[200],
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Column(
+                    children: [
+
+                      Text(
+                        "No Tasks", 
+                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 9,
-                        horizontal: 16,
+                      Text("Click the add button to add a task", style: TextStyle(), textAlign: TextAlign.center,),
+                      SizedBox(height: 20),
+
+                      FloatingActionButton.extended(
+                        elevation: 0,
+                        focusElevation: 0,
+                        hoverElevation: 0,
+                        onPressed: () {
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            isDismissible: true,
+                            context: context, 
+                            builder: (context) {
+                              return const AddTaskScreen();
+                            },
+                          );
+                        }, 
+                        label: const Text("Add Task"),
+                        icon: const Icon(Icons.add),
                       ),
-                      backgroundColor: _selectedTag == e
-                          ? Colors.black87
-                          : Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                            color: _selectedTag == e
-                                ? Colors.transparent
-                                : Colors.black87,
-                            width: _selectedTag == e ? 0 : 1),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
+                    ],
+                  ),
+                )
+              : Container(),
 
             const SizedBox(height: 40),
             GridView(
@@ -132,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 2.2,
               ),
               children: [
-                ...testTasks.map((task) => TaskWidget(task: task)).toList(),
+                ..._tasks.map((task) => TaskWidget(task: task)).toList(),
               ],
             )
           ],
@@ -145,8 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
             isDismissible: true,
             context: context, 
             builder: (context) {
-              // return AddTaskScreen();
-              return const LoginRegisterScreen();
+              return const AddTaskScreen();
             },
           );
         },
@@ -166,5 +240,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _logOut() async {
     FirebaseAuth.instance.signOut();
+  }
+  
+  _getTasks() async {
+    try {
+      FirebaseFirestore.instance
+        .collection("tasks")
+        .where(
+          'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
+        )
+        .where(
+          "progress", isLessThan: 100,
+        )
+        .snapshots()
+        .listen((snapshot) {
+          
+          List<Task> tsks = [];
+          for (var doc in snapshot.docs) {
+            tsks.add(Task.fromMap(doc.data()));
+          }
+          
+          List<String> prjcts = [];
+          for (var pjt in tsks) {
+            prjcts.add(pjt.project);
+          }
+          prjcts = prjcts.toSet().toList();
+          
+          setState(() {
+            _tasks = tsks;
+            _projects = [ "All", ...prjcts ];
+          });
+          
+        });
+    
+    } catch (e) {
+      
+    }
   }
 }
