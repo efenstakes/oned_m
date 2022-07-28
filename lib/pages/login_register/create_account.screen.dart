@@ -123,8 +123,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 ? Container()
                 : 
                   Container(
-                    margin: const EdgeInsets.all(10),
-                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 20
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20, horizontal: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.yellow[200],
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
