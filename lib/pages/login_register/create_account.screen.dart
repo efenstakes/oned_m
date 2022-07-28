@@ -38,7 +38,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       child: Form(
         key: _formKey,
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 100),
+          constraints: const BoxConstraints(maxWidth: 560),
           child: ListView(
             children: [
 
@@ -76,6 +76,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               // Email
               TextFormField(
                 controller: _emailInputController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   border: UnderlineInputBorder(),
                   labelText: 'Enter Email',

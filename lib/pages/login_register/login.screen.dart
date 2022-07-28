@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Form(
         key: _formKey,
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 100),
+          constraints: const BoxConstraints(maxWidth: 560),
           child: ListView(
             children: [
 
@@ -51,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Email
               TextFormField(
                 controller: _emailInputController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   border: UnderlineInputBorder(),
                   labelText: 'Enter Email',
