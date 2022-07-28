@@ -27,6 +27,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final TextEditingController _passwordInputController = TextEditingController();
 
 
+  bool _isLoading = false;
 
 
   @override
@@ -130,6 +131,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     return;
                   }
                   
+                  setState(()=> _isLoading = true);
+
                   try {
                     FirebaseAuth.instance.createUserWithEmailAndPassword(
                       email: _emailInputController.text.trim(), 
@@ -139,6 +142,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     print("error ${e.toString()}");
                   }
 
+                  setState(()=> _isLoading = true);
                 }, 
                 label: Text("Create Account"),
               ),

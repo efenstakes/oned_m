@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailInputController = TextEditingController();
   final TextEditingController _passwordInputController = TextEditingController();
 
-
+  bool _isLoading = false;
 
 
   @override
@@ -105,6 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     return;
                   }
 
+                  setState(()=> _isLoading = true);
+
                   print("form can submit");
 
                   try {
@@ -116,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     print("could not login ${e.toString()}");
                   }
 
+                  setState(()=> _isLoading = true);
                 }, 
                 label: Text("Login"),
               ),
