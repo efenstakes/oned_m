@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -306,25 +307,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 elevation: 0,
                 focusElevation: 0,
                 hoverElevation: 0,
-                onPressed: (){
-                  _formKey.currentState!.save();
-
-                  if( !_formKey.currentState!.validate() ) {
-                    print("form error ");
-                    return;
-                  }
-
-                  print("form can submit");
-                  print(_task);
-
-
-                }, 
+                onPressed: _addTask, 
                 label: Text(
                   _isLoading ? "Adding Task" : "Add Task"
                 ),
                 icon: _isLoading ? const CircularProgressIndicator() : null,
               ),
-
               const SizedBox(height: 80),
 
             ],
@@ -332,5 +320,32 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         ),
       ),
     );
+  }
+  
+  _addTask() async {
+    _formKey.currentState!.save();
+
+    if( !_formKey.currentState!.validate() ) {
+      print("form error ");
+      return;
+    }
+
+    print("form can submit");
+    print(_task.toMap());
+
+    setState(() {
+      _isLoading = true;
+      _error = "";
+    });
+
+    try {
+      var taskRef = FirebaseFirestore.instance.collection("tasks").doc();
+
+      await taskRef.set(_task.toMap());
+    } catch(e) {
+      setState(()=> _error = "Error adding task");
+    }
+
+    setState(()=> _isLoading = false);
   }
 }
