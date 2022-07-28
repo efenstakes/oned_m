@@ -22,6 +22,20 @@ class Task {
   }) { }
 
 
+  Map<String, dynamic> toMap() {
+    return {
+      "id": this.id,
+      "title": this.title,
+      "description": this.description,
+      "project": this.project,
+      "tags": this.tags,
+      "progress": this.progress,
+      "startDate": this.startDate,
+      "deadline": this.deadline,
+    };
+  }
+
+
   @override
   String toString() {
     return """
