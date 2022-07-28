@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "497691951085",
+    "project_id": "oned-10ebb",
+    "storage_bucket": "oned-10ebb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497691951085:android:154b01d955a520c91071e4",
+        "android_client_info": {
+          "package_name": "com.example.oned_m"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "497691951085-0e8gs0nfk9ltm31ko2hqvdkjav92trdd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEzSn-v6eNRWsIe0VhNkSt6wyDdZP4kEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497691951085-0e8gs0nfk9ltm31ko2hqvdkjav92trdd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
