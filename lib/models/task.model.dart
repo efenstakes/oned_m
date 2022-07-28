@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:jiffy/jiffy.dart';
+
 class Task {
   String? id;
   String? title;
@@ -22,6 +24,20 @@ class Task {
   }) { }
 
 
+  static Task fromMap(Map<String, dynamic> _task) {
+    print("_task:startDate ${_task["startDate"]}");
+    return Task(
+      id: _task["id"],
+      title: _task["title"],
+      description: _task["description"],
+      project: _task["project"],
+      tags: [ ..._task["tags"] ],
+      progress: _task["progress"],
+      startDate: new DateTime(2022), // DateTime.tryParse(_task["startDate"]),
+      deadline: new DateTime(2022) // DateTime.tryParse(_task["deadline"])
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       "id": this.id,
@@ -30,8 +46,8 @@ class Task {
       "project": this.project,
       "tags": this.tags,
       "progress": this.progress,
-      "startDate": this.startDate,
-      "deadline": this.deadline,
+      "startDate": this.startDate.toString(),
+      "deadline": this.deadline.toString(),
     };
   }
 
