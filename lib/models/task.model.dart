@@ -32,7 +32,7 @@ class Task {
       description: _task["description"],
       project: _task["project"],
       tags: [ ..._task["tags"] ],
-      progress: _task["progress"],
+      progress: _task["progress"] / 1.0,
       startDate: new DateTime(2022), // DateTime.tryParse(_task["startDate"]),
       deadline: new DateTime(2022) // DateTime.tryParse(_task["deadline"])
     );
