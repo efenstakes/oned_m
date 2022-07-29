@@ -146,7 +146,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 label: Text(
                   _isLoading ? "Creating Account" : "Create Account"
                 ),
-                icon: _isLoading ? CircularProgressIndicator() : null,
+                icon: _isLoading ? const CircularProgressIndicator(color: Colors.white) : null,
               ),
               const SizedBox(height: 20),
               TextButton(onPressed: ()=> widget.switchPage(), child: Text("Have an Account? Login"),),

@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 label: Text(
                   _isLoading ? "Logging in.." : "Login"
                 ),
-                icon: _isLoading ? CircularProgressIndicator() : null,
+                icon: _isLoading ? const CircularProgressIndicator(color: Colors.white) : null,
               ),
               const SizedBox(height: 20),
               TextButton(onPressed: ()=> widget.switchPage(), child: Text("No Account? Create One"),),
