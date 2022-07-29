@@ -344,6 +344,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       await taskRef.set({
         ..._task.toMap(),
+        "id": taskRef.id,
         'user': FirebaseAuth.instance.currentUser?.uid,
       });
     } catch(e) {
