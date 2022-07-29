@@ -36,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _inProgress = 0;
   int _late = 0;
 
+  double _currentSlidingValue = 0;
+
 
   @override
   void initState() {
@@ -207,7 +209,63 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 2.2,
               ),
               children: [
-                ..._tasks.map((task) => TaskWidget(task: task)).toList(),
+                ..._tasks.map((task) { 
+                  return TaskWidget(
+                    task: task,
+                    onDelete: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) {
+
+                          return AlertDialog(
+                            title: Text('Delete?'),
+                            content: Text('Are you sure you want to delete this task?'),
+                            actions: [
+                              IconButton(
+                                    onPressed: ()=> Navigator.pop(ctx), 
+                                    icon: Icon(Icons.close),
+                                  ),
+                            ],
+                          );
+                        }
+                      );
+                    },
+                    onDone: ()=> _setTaskAsDone(task),
+                    onProgress: () {
+                      setState(()=> _currentSlidingValue = task.progress);
+
+                      showDialog(
+                        context: context,
+                        builder: (ctx) {
+
+                          return AlertDialog(
+                            title: Text('Set Progress?'),
+                            content: Slider(
+                              value: _currentSlidingValue,
+                              onChanged: (value) {
+                                setState(() => _currentSlidingValue = value);
+                              },
+                              onChangeEnd: (value) {
+                                setState(() => _currentSlidingValue = value);
+                              },
+                              label: "${_currentSlidingValue}",
+                              thumbColor: Colors.black87,
+                              min: 0,
+                              max: 100,
+                              divisions: 10,
+                            ),
+                            actions: [
+                              IconButton(
+                                    onPressed: ()=> Navigator.pop(ctx), 
+                                    icon: Icon(Icons.close),
+                                  ),
+                            ],
+                          );
+                        }
+                      );
+                    }
+                  );
+                }).toList(),
               ],
             )
           ],
@@ -215,6 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+
           showModalBottomSheet(
             isScrollControlled: true,
             isDismissible: true,
@@ -225,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
         child: const Icon(Icons.add),
-        mini: true,
+        mini: false,
         backgroundColor: Colors.black87,
         elevation: 0,
         hoverElevation: 0,
@@ -273,6 +332,42 @@ class _HomeScreenState extends State<HomeScreen> {
           
         });
     
+    } catch (e) {
+      
+    }
+  }
+
+
+  _setTaskAsDone(Task task) async {
+    try {
+      await FirebaseFirestore.instance
+              .collection("tasks")
+              .doc(task.id)
+              .update({ "progress": 100 });
+    } catch (e) {
+      
+    }
+  }
+
+  _setTaskProgress(Task task, double progress) async {
+    try {
+      await FirebaseFirestore.instance
+              .collection("tasks")
+              .doc(task.id)
+              .update({ "progress": progress });
+    } catch (e) {
+      
+    }
+    setState(()=> _currentSlidingValue = 0);
+  }
+
+
+  _deleteTask(Task task) async {
+    try {
+      await FirebaseFirestore.instance
+              .collection("tasks")
+              .doc(task.id)
+              .delete();
     } catch (e) {
       
     }
