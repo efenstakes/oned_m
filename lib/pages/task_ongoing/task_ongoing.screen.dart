@@ -6,7 +6,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 
 class TaskOngoingScreen extends StatefulWidget {
-  final Task task;
+  final Task? task;
   TaskOngoingScreen({Key? key, required this.task}) : super(key: key);
 
 
@@ -51,7 +51,7 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
 
-    Task task = widget.task;
+    Task? task = widget.task;
 
     return Scaffold(
       body: Container(
@@ -68,7 +68,7 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
             // title
             Center(
               child: Text(
-                task.title!,
+                task?.title ?? "Concentrate",
                 style: Theme.of(context).textTheme.headline2!.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white70,
@@ -78,7 +78,7 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
 
             // project 
             Chip(
-              label: Text(task.project),
+              label: Text(task?.project ?? Jiffy().EEEE),
               labelStyle: const TextStyle(
                 color: Colors.white54,
               ),
