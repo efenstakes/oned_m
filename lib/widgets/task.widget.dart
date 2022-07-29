@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
-import 'package:oned_m/pages/login_register/login_register.screen.dart';
 import 'package:oned_m/pages/task_details/task_details.screen.dart';
-import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
 
 
 class TaskWidget extends StatefulWidget {
@@ -34,7 +32,6 @@ class _TaskWidgetState extends State<TaskWidget> {
       onTap: ()=> Navigator.of(context).push(
         MaterialPageRoute(
           builder: (ctxt)=> TaskDetailsScreen(task: widget.task,)
-          // builder: (ctxt)=> TaskOngoingScreen(task: widget.task,)
         )
       ),
       child: Card(
@@ -56,13 +53,13 @@ class _TaskWidgetState extends State<TaskWidget> {
                 children: [
                   Text(
                     widget.task.title!,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   Container(
-                    width: 12,
-                    height: 12,
+                    width: 14,
+                    height: 14,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: color,
@@ -70,11 +67,13 @@ class _TaskWidgetState extends State<TaskWidget> {
                   )
                 ],
               ),
+              const SizedBox(height: 6),
+                  
 
               // description
               Text(
                 widget.task.description!,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyLarge,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
               ),
@@ -90,7 +89,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: const Icon(Icons.delete_outline_outlined),
                     mini: true,
                     elevation: 0,
-                    key: Key("delete"),
+                    key: const Key("delete"),
                     backgroundColor: Colors.red[600],
                   ),
                   FloatingActionButton(
@@ -98,7 +97,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: const Icon(Icons.stacked_bar_chart_rounded),
                     mini: true,
                     elevation: 0,
-                    key: Key("set status"),
+                    key: const Key("set status"),
                     backgroundColor: Colors.greenAccent[800],
                   ),
                   FloatingActionButton(
@@ -106,7 +105,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: const Icon(Icons.done_all),
                     mini: true,
                     elevation: 0,
-                    key: Key("done"),
+                    key: const Key("done"),
                     backgroundColor: Colors.green[800],
                   ),
                 ],
