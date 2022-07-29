@@ -5,8 +5,11 @@ import 'package:oned_m/models/task.model.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
+  final Function onDelete;
+  final Function onDone;
+  final Function onProgress;
 
-  const TaskWidget({Key? key, required this.task}) : super(key: key);
+  const TaskWidget({Key? key, required this.task, required this.onDone, required this.onProgress, required this.onDelete }) : super(key: key);
 
   @override
   State<TaskWidget> createState() => _TaskWidgetState();
@@ -73,7 +76,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: ()=> widget.onDelete(),
                   child: const Icon(Icons.delete_outline_outlined),
                   mini: true,
                   elevation: 0,
@@ -89,7 +92,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   backgroundColor: Colors.black54,
                 ),
                 FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: ()=> widget.onProgress(),
                   child: const Icon(Icons.query_stats),
                   mini: true,
                   elevation: 0,
@@ -97,7 +100,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   backgroundColor: Colors.greenAccent[800],
                 ),
                 FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: ()=> widget.onDone(),
                   child: const Icon(Icons.done_all),
                   mini: true,
                   elevation: 0,
