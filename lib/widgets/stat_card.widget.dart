@@ -26,7 +26,7 @@ class StatCardWidget extends StatelessWidget {
           horizontal: 12,
           vertical: 20,
         ),
-        constraints: const BoxConstraints(minWidth: 120),
+        constraints: const BoxConstraints(minWidth: 80, maxWidth: 240),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
