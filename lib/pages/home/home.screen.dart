@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/add_task/add_task.screen.dart';
+import 'package:oned_m/pages/home/progress_picker.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
@@ -23,8 +22,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _selectedTag = "All";
+  String _selectedProject = "All";
+  
 
   List<Task> _tasks = [];
+  List<Task> _allTasks = [];
   List<String> _tags = [
     "All"
   ];
@@ -38,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double _currentSlidingValue = 0;
 
+  double _value = 0;
 
   @override
   void initState() {
@@ -67,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
           children: [
@@ -93,12 +96,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 StatCardWidget(
                   stat: _tasks.where((t) => t.progress < 100).length,
-                  title: "In Progress",
+                  title: "On Going",
                   backgroundColor: Colors.blue,
                 ),
                 StatCardWidget(
                   stat: _tasks.where((t) => Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1))).length,
-                  title: "Timing Out",
+                  title: "Close",
                   backgroundColor: Colors.yellow,
                 ),
                 StatCardWidget(
@@ -123,28 +126,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     ..._projects.map((e) {
                       return InkWell(
                         onTap: () => setState(() {
-                          _selectedTag = e;
+                          _selectedProject = e;
+                          _tasks = (e == "All") ? _allTasks : _allTasks.where((t) => t.project == _selectedProject).toList();
                         }),
                         child: Chip(
                           label: Text(e),
                           labelStyle: TextStyle(
                             color:
-                                _selectedTag != e ? Colors.black87 : Colors.white,
+                                _selectedProject != e ? Colors.black87 : Colors.white,
                           ),
                           padding: const EdgeInsets.symmetric(
                             vertical: 9,
                             horizontal: 16,
                           ),
-                          backgroundColor: _selectedTag == e
+                          backgroundColor: _selectedProject == e
                               ? Colors.black87
                               : Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                             side: BorderSide(
-                                color: _selectedTag == e
-                                    ? Colors.transparent
-                                    : Colors.black87,
-                                width: _selectedTag == e ? 0 : 1),
+                              color: _selectedProject == e
+                                  ? Colors.transparent
+                                  : Colors.black87,
+                              width: _selectedProject == e ? 0 : 1,
+                            ),
                           ),
                         ),
                       );
@@ -221,10 +226,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             title: Text('Delete?'),
                             content: Text('Are you sure you want to delete this task?'),
                             actions: [
-                              IconButton(
-                                    onPressed: ()=> Navigator.pop(ctx), 
-                                    icon: Icon(Icons.close),
-                                  ),
+                              TextButton(
+                                onPressed: ()=> Navigator.pop(ctx), 
+                                child: Text("Cancel"),
+                              ),
+                              FloatingActionButton.extended(
+                                key: Key("Delete Task FAB"),
+                                onPressed: ()=> _deleteTask(task, ctx), 
+                                label: Text("Delete"),
+                              ),
                             ],
                           );
                         }
@@ -232,34 +242,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     onDone: ()=> _setTaskAsDone(task),
                     onProgress: () {
-                      setState(()=> _currentSlidingValue = task.progress);
 
                       showDialog(
                         context: context,
                         builder: (ctx) {
 
-                          return AlertDialog(
-                            title: Text('Set Progress?'),
-                            content: Slider(
-                              value: _currentSlidingValue,
-                              onChanged: (value) {
-                                setState(() => _currentSlidingValue = value);
-                              },
-                              onChangeEnd: (value) {
-                                setState(() => _currentSlidingValue = value);
-                              },
-                              label: "${_currentSlidingValue}",
-                              thumbColor: Colors.black87,
-                              min: 0,
-                              max: 100,
-                              divisions: 10,
-                            ),
-                            actions: [
-                              IconButton(
-                                    onPressed: ()=> Navigator.pop(ctx), 
-                                    icon: Icon(Icons.close),
-                                  ),
-                            ],
+                          return ProgressPickerWidget(
+                            task: task
                           );
                         }
                       );
@@ -267,7 +256,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }).toList(),
               ],
-            )
+            ),
+            const SizedBox(height: 120),
+
+
           ],
         ),
       ),
@@ -326,6 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
           prjcts = prjcts.toSet().toList();
           
           setState(() {
+            _allTasks = tsks;
             _tasks = tsks;
             _projects = [ "All", ...prjcts ];
           });
@@ -349,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  _setTaskProgress(Task task, double progress) async {
+  _setTaskProgress(Task task, double progress, BuildContext ctx) async {
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
@@ -359,10 +352,11 @@ class _HomeScreenState extends State<HomeScreen> {
       
     }
     setState(()=> _currentSlidingValue = 0);
+    Navigator.pop(ctx);
   }
 
 
-  _deleteTask(Task task) async {
+  _deleteTask(Task task, BuildContext ctx) async {
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
@@ -371,5 +365,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       
     }
+    Navigator.pop(ctx);
   }
 }
