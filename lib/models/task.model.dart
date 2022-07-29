@@ -10,7 +10,7 @@ class Task {
   String project;
   DateTime? startDate;
   DateTime? deadline;
-  int progress;
+  double progress;
 
   Task({
     this.id, 
