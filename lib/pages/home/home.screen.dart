@@ -8,6 +8,7 @@ import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/add_task/add_task.screen.dart';
 import 'package:oned_m/pages/home/progress_picker.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
+import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
 
@@ -25,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedProject = "All";
   
 
+  bool _isLoadingTasks = false;
+
   List<Task> _tasks = [];
   List<Task> _allTasks = [];
   List<String> _tags = [
@@ -37,10 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _done = 0;
   int _inProgress = 0;
   int _late = 0;
-
-  double _currentSlidingValue = 0;
-
-  double _value = 0;
 
   @override
   void initState() {
@@ -64,6 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         actions: [
           IconButton(
+            onPressed: ()=> Navigator.of(context).push(
+              MaterialPageRoute(builder: (ctx)=> TaskOngoingScreen(task: null))
+            ), 
+            icon: const Icon(Icons.play_arrow_rounded),
+            color: Colors.black87,
+          ),
+          IconButton(
             onPressed: ()=> _logOut(), 
             icon: const Icon(Icons.logout_outlined),
             color: Colors.black87,
@@ -74,15 +80,17 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
           children: [
+
             const SizedBox(height: 40),
+
+            
+            // stats
             Text(
               "Stats",
               style: Theme.of(context).textTheme.headline5!.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
-
-
             Wrap(
               direction: Axis.horizontal,
               alignment: WrapAlignment.start,
@@ -90,22 +98,22 @@ class _HomeScreenState extends State<HomeScreen> {
               spacing: 10,
               children: [
                 StatCardWidget(
-                  stat: _tasks.where((t) => t.progress == 100).length,
+                  stat: _allTasks.where((t) => t.progress == 100).length,
                   title: "Done",
                   backgroundColor: Colors.green,
                 ),
                 StatCardWidget(
-                  stat: _tasks.where((t) => t.progress < 100).length,
+                  stat: _allTasks.where((t) => t.progress < 100).length,
                   title: "On Going",
                   backgroundColor: Colors.blue,
                 ),
                 StatCardWidget(
-                  stat: _tasks.where((t) => Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1))).length,
+                  stat: _allTasks.where((t) => Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1))).length,
                   title: "Close",
                   backgroundColor: Colors.yellow,
                 ),
                 StatCardWidget(
-                  stat: _tasks.where((t) => Jiffy(t.deadline).isAfter(Jiffy())).length,
+                  stat: _allTasks.where((t) => Jiffy(t.deadline).isAfter(Jiffy())).length,
                   title: "Late",
                   backgroundColor: Colors.red,
                 ),
@@ -159,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : Container(),
 
 
-            ( _tasks.isEmpty ) 
+            ( !_isLoadingTasks && _tasks.isEmpty ) 
               ?
                 Container(
                   margin: const EdgeInsets.symmetric(
@@ -206,8 +214,39 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : Container(),
 
+            ( _isLoadingTasks )
+              ? 
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 120
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20, horizontal: 10,
+                  ),
+                  decoration: const BoxDecoration(
+                    // color: Colors.brown[200],
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Column(
+                    children: [
+
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 12),
+
+                      Text(
+                        "Loading Tasks", 
+                        style: Theme.of(context).textTheme.headline5!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
+
             const SizedBox(height: 40),
             GridView(
+              primary: true,
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: taskNumber,
@@ -223,8 +262,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (ctx) {
 
                           return AlertDialog(
-                            title: Text('Delete?'),
-                            content: Text('Are you sure you want to delete this task?'),
+                            title: const Text('Delete?'),
+                            content: const Text('Are you sure you want to delete this task?'),
                             actions: [
                               TextButton(
                                 onPressed: ()=> Navigator.pop(ctx), 
@@ -294,15 +333,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   
   _getTasks() async {
+    setState(()=> _isLoadingTasks = true);
     try {
-      FirebaseFirestore.instance
+      await FirebaseFirestore.instance
         .collection("tasks")
         .where(
           'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
         )
-        // .where(
-        //   "progress", isLessThan: 100,
-        // )
+        .where(
+          "progress", isLessThan: 100,
+        )
+        // .orderBy("startDate")
         .snapshots()
         .listen((snapshot) {
           
@@ -326,8 +367,9 @@ class _HomeScreenState extends State<HomeScreen> {
         });
     
     } catch (e) {
-      
+      print("error getting tasks ${e.toString()}");
     }
+    setState(()=> _isLoadingTasks = false);
   }
 
 
@@ -351,7 +393,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       
     }
-    setState(()=> _currentSlidingValue = 0);
     Navigator.pop(ctx);
   }
 
