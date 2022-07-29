@@ -40,6 +40,27 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   String _error = "";
 
 
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _tagsfocusNode.addListener(() {
+      
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _tagsfocusNode.dispose();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -263,6 +284,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               RawKeyboardListener(
                 focusNode: _tagsfocusNode, 
                 child: TextFormField(
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (value) {
+                    if( value.isEmpty ) return;
+                    _task.tags.add(_tagInputController.text);
+                    _tagInputController.clear();
+                    _tagsfocusNode.requestFocus();
+                  },
                   controller: _tagInputController,
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
@@ -271,6 +299,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
                 ),
                 onKey: (event) {
+                  if( _tagInputController.text.isEmpty ) return;
                   if( event.isKeyPressed(LogicalKeyboardKey.enter) ) {
                     setState(() {
                       _task.tags.add(_tagInputController.text);
@@ -312,7 +341,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 label: Text(
                   _isLoading ? "Adding Task" : "Add Task"
                 ),
-                icon: _isLoading ? const CircularProgressIndicator() : null,
+                icon: _isLoading ? const CircularProgressIndicator(color: Colors.white,) : null,
               ),
               const SizedBox(height: 80),
 
