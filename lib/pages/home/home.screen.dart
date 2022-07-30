@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   
 
   bool _isLoadingTasks = false;
+  bool _fetched = false;
 
   List<Task> _tasks = [];
   List<Task> _allTasks = [];
@@ -350,11 +351,11 @@ class _HomeScreenState extends State<HomeScreen> {
         .snapshots()
         .listen((snapshot) {
 
-          if( snapshot.docChanges.isNotEmpty) {
+          if( _fetched && snapshot.docChanges.isNotEmpty ) {
             Fluttertoast.showToast(
               msg: "${snapshot.docChanges.length} New Habits Added",
               toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
+              gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
               backgroundColor: Colors.green[700],
               textColor: Colors.white,
@@ -377,6 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _allTasks = tsks;
             _tasks = tsks;
             _projects = [ "All", ...prjcts ];
+            _fetched = true;
           });
           
         });
