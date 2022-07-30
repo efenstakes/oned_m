@@ -115,17 +115,19 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
                       ?
                         Text(
                           "${hours} : ${minutes}",
-                          style: Theme.of(context).textTheme.headline1!.copyWith(
+                          style: Theme.of(context).textTheme.displayLarge!.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white70,
+                                fontSize: 132,
                               ),
                         )
                       :
                         Text(
                           "${minutes} : ${seconds}",
-                          style: Theme.of(context).textTheme.headline1!.copyWith(
+                          style: Theme.of(context).textTheme.displayLarge!.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white70,
+                                fontSize: 132,
                               ),
                         )
 
