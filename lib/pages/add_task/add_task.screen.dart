@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 
@@ -78,7 +79,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
               // title
               Text(
-                "Add Task",
+                "Add Habit",
                 style: Theme.of(context).textTheme.headline4!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -160,9 +161,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 type: DateTimePickerType.date,
                 dateMask: 'd MMM, yyyy',
                 initialValue: DateTime.now().toString(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-                icon: Icon(Icons.event),
+                firstDate: DateTime.now(),
+                lastDate: Jiffy(DateTime.now()).add(years: 2).dateTime,
+                icon: const Icon(Icons.event),
                 dateLabelText: 'Date',
                 timeLabelText: "Hour",
                 selectableDayPredicate: (date) {
@@ -179,9 +180,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   return null;
                 },
                 onSaved: (val) {
-                  print("on save start date value ${val.toString()}");
+                  // print("on save start date value ${val.toString()}");
+                  // print("on save start date value ${val.toString()}");
+                  // print("on save start date value ${Jiffy(val, "dd-MM-yyyy").dateTime.millisecondsSinceEpoch/1000}");
+                  // print("on save start date value ${DateTime.fromMillisecondsSinceEpoch((DateTime.parse(val!).millisecondsSinceEpoch/1000).toInt())}");
                   setState(() {
-                    _task.startDate = Jiffy(val, "dd-MM-yyyy").dateTime;
+                    _task.startDate = Jiffy(val).dateTime;
                   });
                 },
               ),
@@ -199,9 +203,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 type: DateTimePickerType.date,
                 dateMask: 'd MMM, yyyy',
                 initialValue: DateTime.now().toString(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-                icon: Icon(Icons.event),
+                firstDate: DateTime.now(),
+                lastDate: Jiffy(DateTime.now()).add(years: 5).dateTime,
+                icon: const Icon(Icons.event),
                 dateLabelText: 'Date',
                 timeLabelText: "Hour",
                 selectableDayPredicate: (date) {
@@ -220,7 +224,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 onSaved: (val) {
                   print("on save deadline value ${val.toString()}");
                   setState(() {
-                    _task.deadline = Jiffy(val, "dd-MM-yyyy").dateTime;
+                    _task.deadline = Jiffy(val).dateTime;
                   });
                 },
               ),
@@ -331,17 +335,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ),
 
 
-
               // add button
               FloatingActionButton.extended(
                 elevation: 0,
                 focusElevation: 0,
                 hoverElevation: 0,
-                onPressed: _addTask, 
+                onPressed: ()=> _addTask(context),
                 label: Text(
-                  _isLoading ? "Adding Task" : "Add Task"
+                  _isLoading ? "Adding Habit" : "Add Habit"
                 ),
                 icon: _isLoading ? const CircularProgressIndicator(color: Colors.white,) : null,
+                key: const Key("HP:Add Task"),
               ),
               const SizedBox(height: 80),
 
@@ -352,7 +356,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
   
-  _addTask() async {
+  _addTask(BuildContext context) async {
     _formKey.currentState!.save();
 
     if( !_formKey.currentState!.validate() ) {
@@ -361,6 +365,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
 
     print("form can submit");
+    print("_task start ${_task.startDate.toString()}");
     print(_task.toMap());
 
     setState(() {
@@ -376,10 +381,39 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         "id": taskRef.id,
         'user': FirebaseAuth.instance.currentUser?.uid,
       });
-    } catch(e) {
-      setState(()=> _error = "Error adding task");
-    }
 
-    setState(()=> _isLoading = false);
+      // var snackBar = SnackBar(
+      //   content: const Center(child: const Text("Task Added Successfully")),
+      //   backgroundColor: Colors.green[700],
+      //   duration: const Duration(milliseconds: 500),
+      //   padding: const EdgeInsets.symmetric(
+      //     vertical: 10, horizontal: 16,
+      //   ),
+      //   margin: EdgeInsets.symmetric(
+      //     vertical: MediaQuery.of(context).size.height/20, 
+      //     horizontal: MediaQuery.of(context).size.height/10,
+      //   ),
+      // );
+      // // ignore: use_build_context_synchronously
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      Fluttertoast.showToast(
+        msg: "Habit Added Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green[700],
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+      await Future.delayed(
+        const Duration(milliseconds: 2500),
+        ()=> Navigator.of(context).pop(),
+      );
+    } catch(e) {
+      setState(() {
+        _error = "Error adding task";
+        _isLoading = false;
+      });
+    }
   }
 }
