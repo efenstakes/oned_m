@@ -8,6 +8,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/add_task/add_task.screen.dart';
 import 'package:oned_m/pages/home/progress_picker.dart';
+import 'package:oned_m/pages/home/quote_of_the_day.widget.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
 import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
@@ -82,9 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
           children: [
-
             const SizedBox(height: 40),
 
+            const QuoteOfTheDayWidget(),
             
             // stats
             Text(
@@ -115,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.yellow[700]!,
                 ),
                 StatCardWidget(
-                  stat: _allTasks.where((t) => Jiffy(t.deadline).isAfter(Jiffy())).length,
+                  stat: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isAfter(Jiffy())).length,
                   title: "Late",
                   backgroundColor: Colors.pink[300]!,
                 ),
