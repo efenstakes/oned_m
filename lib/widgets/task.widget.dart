@@ -89,7 +89,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: const Icon(Icons.delete_outline_outlined),
                     mini: true,
                     elevation: 0,
-                    key: const Key("delete"),
+                    key: const Key("SCW:delete"),
                     backgroundColor: Colors.red[600],
                   ),
                   FloatingActionButton(
@@ -97,7 +97,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: const Icon(Icons.stacked_bar_chart_rounded),
                     mini: true,
                     elevation: 0,
-                    key: const Key("set status"),
+                    key: const Key("SCW:set status"),
                     backgroundColor: Colors.greenAccent[800],
                   ),
                   FloatingActionButton(
@@ -105,7 +105,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: const Icon(Icons.done_all),
                     mini: true,
                     elevation: 0,
-                    key: const Key("done"),
+                    key: const Key("SCW:done"),
                     backgroundColor: Colors.green[800],
                   ),
                 ],
