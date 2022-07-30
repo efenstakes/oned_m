@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:jiffy/jiffy.dart';
 
@@ -21,33 +21,33 @@ class Task {
     this.startDate, 
     this.deadline,
     this.progress = 0
-  }) { }
+  });
 
 
-  static Task fromMap(Map<String, dynamic> _task) {
-    print("_task:startDate ${_task["startDate"]}");
+  static Task fromMap(Map<String, dynamic> task) {
+    print("_task:startDate ${task["startDate"]}");
     return Task(
-      id: _task["id"],
-      title: _task["title"],
-      description: _task["description"],
-      project: _task["project"],
-      tags: [ ..._task["tags"] ],
-      progress: _task["progress"] / 1.0,
-      startDate: new DateTime(2022), // DateTime.tryParse(_task["startDate"]),
-      deadline: new DateTime(2022) // DateTime.tryParse(_task["deadline"])
+      id: task["id"],
+      title: task["title"],
+      description: task["description"],
+      project: task["project"],
+      tags: [ ...task["tags"] ],
+      progress: task["progress"] / 1.0,
+      startDate: DateTime.tryParse(task["startDate"]),
+      deadline: DateTime.tryParse(task["deadline"])
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "id": this.id,
-      "title": this.title,
-      "description": this.description,
-      "project": this.project,
-      "tags": this.tags,
-      "progress": this.progress,
-      "startDate": this.startDate.toString(),
-      "deadline": this.deadline.toString(),
+      "id": id,
+      "title": title,
+      "description": description,
+      "project": project,
+      "tags": tags,
+      "progress": progress,
+      "startDate": Jiffy(startDate).format("yyyy-MM-d"),
+      "deadline": Jiffy(deadline).format("yyyy-MM-d"),
     };
   }
 
