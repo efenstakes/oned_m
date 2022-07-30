@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/add_task/add_task.screen.dart';
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    
     _getTasks();
   }
 
@@ -100,22 +101,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 StatCardWidget(
                   stat: _allTasks.where((t) => t.progress == 100).length,
                   title: "Done",
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.lightGreen[600]!,
                 ),
                 StatCardWidget(
                   stat: _allTasks.where((t) => t.progress < 100).length,
                   title: "On Going",
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Colors.blue[300]!,
                 ),
                 StatCardWidget(
-                  stat: _allTasks.where((t) => Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1))).length,
+                  stat: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1)) ).length,
                   title: "Close",
-                  backgroundColor: Colors.yellow,
+                  backgroundColor: Colors.yellow[700]!,
                 ),
                 StatCardWidget(
                   stat: _allTasks.where((t) => Jiffy(t.deadline).isAfter(Jiffy())).length,
                   title: "Late",
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.pink[300]!,
                 ),
               ],
             ),
@@ -128,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ?
                 Wrap(
                   alignment: WrapAlignment.center,
-                  runSpacing: 10,
+                  runSpacing: 0,
                   spacing: 10,
                   children: [
                     ..._projects.map((e) {
@@ -208,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }, 
                         label: const Text("Add Task"),
                         icon: const Icon(Icons.add),
+                        key: const Key("HP:Add Task"),
                       ),
                     ],
                   ),
@@ -341,13 +343,25 @@ class _HomeScreenState extends State<HomeScreen> {
         .where(
           'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
         )
-        .where(
-          "progress", isLessThan: 100,
-        )
+        // .where(
+        //   "progress", isLessThan: 100,
+        // )
         // .orderBy("startDate")
         .snapshots()
         .listen((snapshot) {
-          
+
+          if( snapshot.docChanges.isNotEmpty) {
+            Fluttertoast.showToast(
+              msg: "${snapshot.docChanges.length} New Habits Added",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green[700],
+              textColor: Colors.white,
+              fontSize: 16.0
+            );
+          }
+           
           List<Task> tsks = [];
           for (var doc in snapshot.docs) {
             tsks.add(Task.fromMap(doc.data()));
@@ -366,7 +380,15 @@ class _HomeScreenState extends State<HomeScreen> {
           });
           
         });
-    
+        // Fluttertoast.showToast(
+        //   msg: "New Habit Added",
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.CENTER,
+        //   timeInSecForIosWeb: 1,
+        //   backgroundColor: Colors.green[700],
+        //   textColor: Colors.white,
+        //   fontSize: 16.0
+        // );
     } catch (e) {
       print("error getting tasks ${e.toString()}");
     }
