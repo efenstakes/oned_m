@@ -25,15 +25,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     // TODO: implement initState
     super.initState();
 
-    Timer.periodic(
-      Duration(milliseconds: 10), 
-      (Timer t){
-        if( _progressNofier.value >= widget.task.progress ) {
-          t.cancel();
-        }
-        _progressNofier.value += 1;
-      }
-    );
+
+    updateProgressTo(widget.task.progress);
+        
   }
 
   @override
@@ -66,7 +60,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           Row(
             children: [
 
-Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -290,7 +284,17 @@ Expanded(
 
 
   
-
+  void updateProgressTo(double val) {
+    Timer.periodic(
+      Duration(milliseconds: 5), 
+      (Timer t){
+        if( _progressNofier.value >= val ) {
+          t.cancel();
+        }
+        _progressNofier.value += 1;
+      }
+    );
+  }
 
   _setTaskAsDone(Task task) async {
     try {
@@ -298,10 +302,13 @@ Expanded(
               .collection("tasks")
               .doc(task.id)
               .update({ "progress": 100 });
+              
+      updateProgressTo(100);
     } catch (e) {
       
     }
   }
+
 
   _setTaskProgress(Task task, double progress, BuildContext ctx) async {
     try {
@@ -309,6 +316,12 @@ Expanded(
               .collection("tasks")
               .doc(task.id)
               .update({ "progress": progress });
+              
+              
+      if( task.progress == 100 ) {
+        _progressNofier.value = 0;
+      }
+      updateProgressTo(progress);
     } catch (e) {
       
     }
