@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/home/progress_picker.dart';
 import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
@@ -44,6 +45,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
     Task task = widget.task;
 
     return Scaffold(
@@ -61,14 +63,63 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         children: [
 
           const SizedBox(height: 40),
-          SimpleCircularProgressBar(
-            valueNotifier: _progressNofier,
-            mergeMode: true,
-            onGetText: (double value) {
-                return Text('${value.toInt()}%');
-            },
-            size: 200,
-            startAngle: 0,
+          Row(
+            children: [
+
+Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    Text(
+                      "Start",
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black38
+                      ),
+                    ),
+                    Text(
+                      Jiffy(task.startDate).MMMEd,
+                      style: Theme.of(context).textTheme.headline5!,
+                    ),
+                    const SizedBox(height: 16),
+
+                    Text(
+                      "Deadline",
+                      style: Theme.of(context).textTheme.headline4!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black38
+                      ),
+                    ),
+                    Text(
+                      Jiffy(task.deadline).MMMEd,
+                      style: Theme.of(context).textTheme.headline5!,
+                    ),
+
+                  ],
+                ),
+              ),
+
+              SizedBox(width: screenSize.width/10),
+
+              
+              Expanded(
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  child: SimpleCircularProgressBar(
+                    valueNotifier: _progressNofier,
+                    mergeMode: true,
+                    onGetText: (double value) {
+                        return Text('${value.toInt()}%');
+                    },
+                    size: 180,
+                    fullProgressColor: Colors.green,
+                    // startAngle: 0,
+                  ),
+                ),
+              ),
+
+            ],
           ),
           const SizedBox(height: 40),
 
@@ -178,7 +229,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 icon: const Icon(Icons.delete_outline_outlined),
                 elevation: 0,
                 key: const Key("TDS:delete"),
-                backgroundColor: Colors.red[600],
+                backgroundColor: Color.fromARGB(255, 229, 101, 98),
                 // extendedPadding: const EdgeInsets.symmetric(horizontal: 32)
               ),
               FloatingActionButton.extended(
@@ -207,7 +258,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 // mini: true,
                 elevation: 0,
                 key: const Key("TDS:done"),
-                backgroundColor: Colors.green[800],
+                backgroundColor: Color.fromARGB(255, 21, 118, 25),
                 // extendedPadding: const EdgeInsets.symmetric(horizontal: 32)
               ),
             ],
