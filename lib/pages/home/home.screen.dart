@@ -13,6 +13,7 @@ import 'package:oned_m/pages/home/quote_of_the_day.widget.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
 import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
 import 'package:oned_m/widgets/no_tasks.widget.dart';
+import 'package:oned_m/widgets/selectable_chip.widget.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/stats.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
@@ -112,34 +113,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   spacing: 10,
                   children: [
                     ..._projects.map((e) {
-                      return InkWell(
-                        onTap: () => setState(() {
+                      
+                      return SelectableChipWidget(
+                        text: e, 
+                        isSelected: _selectedProject != e, 
+                        onSelect: () => setState(() {
                           _selectedProject = e;
-                          _tasks = (e == "All") ? _allTasks : _allTasks.where((t) => t.project == _selectedProject).toList();
-                        }),
-                        child: Chip(
-                          label: Text(e),
-                          labelStyle: TextStyle(
-                            color:
-                                _selectedProject != e ? Colors.black87 : Colors.white,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 9,
-                            horizontal: 16,
-                          ),
-                          backgroundColor: _selectedProject == e
-                              ? Colors.black87
-                              : Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(
-                              color: _selectedProject == e
-                                  ? Colors.transparent
-                                  : Colors.black87,
-                              width: _selectedProject == e ? 0 : 1,
-                            ),
-                          ),
-                        ),
+                          _todayTasks = (e == "All") ? _allTodayTasks : _allTodayTasks.where((t) => t.project == _selectedProject).toList();
+                        })
                       );
                     }).toList(),
                   ],
