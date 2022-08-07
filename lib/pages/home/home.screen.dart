@@ -15,6 +15,7 @@ import 'package:oned_m/widgets/no_tasks.widget.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/stats.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
+import 'package:oned_m/widgets/tasks_loading.widget.dart';
 
 
 
@@ -162,33 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : Container(),
 
             ( _isLoadingTasks )
-              ? 
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 120
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 20, horizontal: 10,
-                  ),
-                  decoration: const BoxDecoration(
-                    // color: Colors.brown[200],
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Column(
-                    children: [
-
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 12),
-
-                      Text(
-                        "Loading Tasks", 
-                        style: Theme.of(context).textTheme.headline5!.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+              ? const TasksLoadingWidget()
               : Container(),
 
             const SizedBox(height: 40),
