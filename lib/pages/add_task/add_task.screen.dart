@@ -333,7 +333,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   ...DAYS.map((e) {
 
                     return SelectableChipWidget(
-                      text: e, 
+                      text: e[0], 
                       isSelected: _task.repeats.contains(e), 
                       onSelect: ()=> _addDayToRepeats(e)
                     );
