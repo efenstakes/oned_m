@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -146,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : Container(),
 
 
-            ( !_isLoadingTasks && _tasks.isEmpty ) 
+            ( !_isLoadingTasks && _allTodayTasks.isEmpty ) 
               ?
                 NoTasksWidget(
                   addTask: () {
@@ -176,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 2.2,
               ),
               children: [
-                ..._tasks.map((task) { 
+                ..._todayTasks.map((task) { 
                   return TaskWidget(
                     task: task,
                     onDelete: () {
@@ -257,13 +258,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _getTasks() async {
     await _getTasksForToday();
-    _getTasksAll();
+    // _getTasksAll();
   }
 
   _getTasksForToday() async {
     setState(()=> _isLoadingTasks = true);
+    print("await _getTasksForToday();");
+    print("user ${FirebaseAuth.instance.currentUser!.uid}");
     
     String today = DAYS[(DateTime.now().weekday - 1)];
+    String dateString = Jiffy(DateTime.now()).format("yyyy-MM-d");
+
+    print("today $today");
 
     try {
       await FirebaseFirestore.instance
@@ -272,14 +278,17 @@ class _HomeScreenState extends State<HomeScreen> {
           'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
         )
         .where(
-          "repeats", arrayContains: [ today ]
+          "priority", isEqualTo: "HIGH"
+        )
+        .where(
+          "repeats", arrayContainsAny: [ today ]
         )
         // .where(
         //   "progress", isLessThan: 100,
         // )
         // .orderBy("startDate")
         .snapshots()
-        .listen((snapshot) {
+        .listen((snapshot) async {
 
           // if( _fetched && snapshot.docChanges.isNotEmpty ) {
           //   Fluttertoast.showToast(
@@ -295,7 +304,34 @@ class _HomeScreenState extends State<HomeScreen> {
            
           List<Task> tsks = [];
           for (var doc in snapshot.docs) {
-            tsks.add(Task.fromMap(doc.data()));
+            print("now on doc ${doc.id}");
+            Task tk = Task.fromMap(doc.data());
+
+            if( tk.repeats.contains(today) ) {
+              print("$today is in task repeats");
+
+              var docCompletion = await FirebaseFirestore.instance
+                                          .collection("tasks")
+                                          .doc(doc.id)
+                                          .collection("repeats")
+                                          .doc(dateString)
+                                          .get();
+              
+              if( docCompletion.exists ) {
+                print("docCompletion ${docCompletion.data()}");
+
+                tk.completion = {
+                  "progress": docCompletion.data()?["progress"] ?? 0,
+                };
+              } else {
+                print("docCompletion no data");
+              }
+
+            } else {
+              print("$today is not in task repeats");
+            }
+            
+            tsks.add(tk);
           }
           
           List<String> prjcts = [];
@@ -367,17 +403,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   _setTaskAsDone(Task task) async {
-    try {
-      await FirebaseFirestore.instance
-              .collection("tasks")
-              .doc(task.id)
-              .update({ "progress": 100 });
-    } catch (e) {
-      
+    if( task.repeats.isNotEmpty ) {
+      _setRepeatingTaskProgress(task, 100);
+    } else {
+      _setInTaskProgress(task, 100);
     }
   }
 
   _setTaskProgress(Task task, double progress, BuildContext ctx) async {
+    if( task.repeats.isNotEmpty ) {
+      _setRepeatingTaskProgress(task, progress);
+    } else {
+      _setInTaskProgress(task, progress);
+    }
+    
+    Navigator.pop(ctx);
+  }
+
+  _setInTaskProgress(Task task, double progress) async {
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
@@ -386,7 +429,24 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       
     }
-    Navigator.pop(ctx);
+  }
+
+  _setRepeatingTaskProgress(Task task, double progress) async {
+    String dateString = Jiffy(DateTime.now()).format("yyyy-MM-d");
+
+    try {
+      await FirebaseFirestore.instance
+              .collection("tasks")
+              .doc(task.id)
+              .collection("repeats")
+              .doc(dateString)
+              .set({
+                "date": dateString,
+                "progress": progress,
+              });
+    } catch (e) {
+      
+    }
   }
 
 
@@ -401,4 +461,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     Navigator.pop(ctx);
   }
+
+
 }
