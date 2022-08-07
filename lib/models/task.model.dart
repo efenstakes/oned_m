@@ -23,6 +23,9 @@ class Task {
   List<String> repeats;
   String priority;
 
+  Map<String, bool>? completion;
+  List<Map<String, bool>>? completions;
+
   Task({
     this.id, 
     this.description, 
@@ -33,7 +36,7 @@ class Task {
     this.deadline,
     this.progress = 0,
     required this.repeats,
-    this.priority = "MEDIUM"
+    this.priority = "MEDIUM",
   });
 
 
