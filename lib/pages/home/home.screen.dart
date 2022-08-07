@@ -92,42 +92,12 @@ class _HomeScreenState extends State<HomeScreen> {
             const QuoteOfTheDayWidget(),
             
             // stats
-            Text(
-              "Stats",
-              style: Theme.of(context).textTheme.headline5!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            StatsWidget(
+              done: _allTasks.where((t) => t.progress == 100).length, 
+              onGoing: _allTasks.where((t) => t.progress < 100).length, 
+              close: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1)) ).length, 
+              later: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isAfter(Jiffy())).length,
             ),
-            Wrap(
-              direction: Axis.horizontal,
-              alignment: WrapAlignment.start,
-              runSpacing: 10,
-              spacing: 10,
-              children: [
-                StatCardWidget(
-                  stat: _allTasks.where((t) => t.progress == 100).length,
-                  title: "Done",
-                  backgroundColor: Colors.lightGreen[600]!,
-                ),
-                StatCardWidget(
-                  stat: _allTasks.where((t) => t.progress < 100).length,
-                  title: "On Going",
-                  backgroundColor: Colors.blue[300]!,
-                ),
-                StatCardWidget(
-                  stat: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1)) ).length,
-                  title: "Close",
-                  backgroundColor: Colors.yellow[700]!,
-                ),
-                StatCardWidget(
-                  stat: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isAfter(Jiffy())).length,
-                  title: "Late",
-                  backgroundColor: Colors.pink[300]!,
-                ),
-              ],
-            ),
-
-
             const SizedBox(height: 60),
 
             // _projects
