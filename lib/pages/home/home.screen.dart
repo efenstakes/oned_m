@@ -12,6 +12,7 @@ import 'package:oned_m/pages/home/quote_of_the_day.widget.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
 import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
+import 'package:oned_m/widgets/stats.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
 
 
@@ -30,6 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isLoadingTasks = false;
   bool _fetched = false;
+
+  List<Task> _todayTasks = [];
+  List<Task> _allTodayTasks = [];
 
   List<Task> _tasks = [];
   List<Task> _allTasks = [];
@@ -336,14 +340,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _logOut() async {
     FirebaseAuth.instance.signOut();
   }
-  
+
   _getTasks() async {
+    await _getTasksForToday();
+    _getTasksAll();
+  }
+
+  _getTasksForToday() async {
     setState(()=> _isLoadingTasks = true);
+    
+    String today = DAYS[DateTime.now().weekday];
+
     try {
       await FirebaseFirestore.instance
         .collection("tasks")
         .where(
           'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
+        )
+        .where(
+          "repeats", arrayContains: [ today ]
         )
         // .where(
         //   "progress", isLessThan: 100,
@@ -352,17 +367,73 @@ class _HomeScreenState extends State<HomeScreen> {
         .snapshots()
         .listen((snapshot) {
 
-          if( _fetched && snapshot.docChanges.isNotEmpty ) {
-            Fluttertoast.showToast(
-              msg: "${snapshot.docChanges.length} New Habits Added",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green[700],
-              textColor: Colors.white,
-              fontSize: 16.0
-            );
+          // if( _fetched && snapshot.docChanges.isNotEmpty ) {
+          //   Fluttertoast.showToast(
+          //     msg: "${snapshot.docChanges.length} New Habits Added",
+          //     toastLength: Toast.LENGTH_SHORT,
+          //     gravity: ToastGravity.BOTTOM,
+          //     timeInSecForIosWeb: 1,
+          //     backgroundColor: Colors.green[700],
+          //     textColor: Colors.white,
+          //     fontSize: 16.0
+          //   );
+          // }
+           
+          List<Task> tsks = [];
+          for (var doc in snapshot.docs) {
+            tsks.add(Task.fromMap(doc.data()));
           }
+          
+          List<String> prjcts = [];
+          for (var pjt in tsks) {
+            prjcts.add(pjt.project);
+          }
+          prjcts = prjcts.toSet().toList();
+          
+          setState(() {
+            _allTodayTasks = tsks;
+            _todayTasks = tsks;
+            _projects = [ "All", ...prjcts ];
+            _fetched = true;
+          });
+          
+        });
+        // Fluttertoast.showToast(
+        //   msg: "New Habit Added",
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.CENTER,
+        //   timeInSecForIosWeb: 1,
+        //   backgroundColor: Colors.green[700],
+        //   textColor: Colors.white,
+        //   fontSize: 16.0
+        // );
+    } catch (e) {
+      print("error getting tasks ${e.toString()}");
+    }
+    setState(()=> _isLoadingTasks = false);
+  }
+ 
+  _getTasksAll() async {
+    try {
+      await FirebaseFirestore.instance
+        .collection("tasks")
+        .where(
+          'user', isEqualTo: FirebaseAuth.instance.currentUser!.uid 
+        )
+        .snapshots()
+        .listen((snapshot) {
+
+          // if( _fetched && snapshot.docChanges.isNotEmpty ) {
+          //   Fluttertoast.showToast(
+          //     msg: "${snapshot.docChanges.length} New Habits Added",
+          //     toastLength: Toast.LENGTH_SHORT,
+          //     gravity: ToastGravity.BOTTOM,
+          //     timeInSecForIosWeb: 1,
+          //     backgroundColor: Colors.green[700],
+          //     textColor: Colors.white,
+          //     fontSize: 16.0
+          //   );
+          // }
            
           List<Task> tsks = [];
           for (var doc in snapshot.docs) {
@@ -383,20 +454,11 @@ class _HomeScreenState extends State<HomeScreen> {
           });
           
         });
-        // Fluttertoast.showToast(
-        //   msg: "New Habit Added",
-        //   toastLength: Toast.LENGTH_SHORT,
-        //   gravity: ToastGravity.CENTER,
-        //   timeInSecForIosWeb: 1,
-        //   backgroundColor: Colors.green[700],
-        //   textColor: Colors.white,
-        //   fontSize: 16.0
-        // );
     } catch (e) {
       print("error getting tasks ${e.toString()}");
     }
-    setState(()=> _isLoadingTasks = false);
   }
+
 
 
   _setTaskAsDone(Task task) async {
