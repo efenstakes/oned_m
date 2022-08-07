@@ -73,12 +73,15 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          IconButton(
-            onPressed: ()=> Navigator.of(context).push(
-              MaterialPageRoute(builder: (ctx)=> TaskOngoingScreen(task: null))
-            ), 
-            icon: const Icon(Icons.play_arrow_rounded),
-            color: Colors.black87,
+          Hero(
+            tag: const Key("PLAY_IT"),
+            child: IconButton(
+              onPressed: ()=> Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx)=> TaskOngoingScreen(task: null))
+              ), 
+              icon: const Icon(Icons.play_arrow_rounded),
+              color: Colors.black87,
+            ),
           ),
           IconButton(
             onPressed: ()=> _logOut(), 
