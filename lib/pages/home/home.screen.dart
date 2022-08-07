@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 40),
             GridView(
-              physics: ScrollPhysics(),
+              physics: const ScrollPhysics(),
               primary: true,
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
   _getTasksForToday() async {
     setState(()=> _isLoadingTasks = true);
     
-    String today = DAYS[DateTime.now().weekday];
+    String today = DAYS[(DateTime.now().weekday - 1)];
 
     try {
       await FirebaseFirestore.instance
@@ -312,15 +312,6 @@ class _HomeScreenState extends State<HomeScreen> {
           });
           
         });
-        // Fluttertoast.showToast(
-        //   msg: "New Habit Added",
-        //   toastLength: Toast.LENGTH_SHORT,
-        //   gravity: ToastGravity.CENTER,
-        //   timeInSecForIosWeb: 1,
-        //   backgroundColor: Colors.green[700],
-        //   textColor: Colors.white,
-        //   fontSize: 16.0
-        // );
     } catch (e) {
       print("error getting tasks ${e.toString()}");
     }
