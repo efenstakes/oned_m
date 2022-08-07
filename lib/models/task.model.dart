@@ -23,8 +23,8 @@ class Task {
   List<String> repeats;
   String priority;
 
-  Map<String, bool>? completion;
-  List<Map<String, bool>>? completions;
+  Map<String, double>? completion;
+  List<Map<String, double>>? completions;
 
   Task({
     this.id, 
