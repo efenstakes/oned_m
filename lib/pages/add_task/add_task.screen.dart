@@ -230,6 +230,98 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 40),
 
+
+    
+              // repeats on?
+              Text(
+                "Repeats On",
+                style: Theme.of(context).textTheme.headline6!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.center,
+                runSpacing: 10,
+                spacing: 10,
+                children: [
+                  ...DAYS.map((e) {
+                    return InkWell(
+                      onTap: ()=> _addDayToRepeats(e),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 600),
+                        child: Text(
+                          e,
+                          style: TextStyle(
+                            color: _task.repeats.contains(e) ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 9,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _task.repeats.contains(e) ? Colors.black87 : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+
+    
+              // priority
+              Text(
+                "Priority",
+                style: Theme.of(context).textTheme.headline6!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.center,
+                runSpacing: 10,
+                spacing: 10,
+                children: [
+                  ...PROPRITIES.map((e) {
+                    return ChoiceChip(
+                      label: Text(e), 
+                      selected: _task.priority == e,
+                      onSelected: (bool v) {
+                        if( !v ) return; 
+                        setState(()=> _task.priority = e);
+                      },
+                    );
+                    return InkWell(
+                      onTap: ()=> _addDayToRepeats(e),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 600),
+                        child: Text(
+                          e,
+                          style: TextStyle(
+                            color: _task.repeats.contains(e) ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 9,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _task.repeats.contains(e) ? Colors.black87 : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+
+
               // tags added
               _task.tags.isEmpty 
                 ? 
@@ -283,7 +375,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               const SizedBox(height: 40),
 
-    
+
               // tags form
               RawKeyboardListener(
                 focusNode: _tagsfocusNode, 
@@ -356,6 +448,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
   
+
+  _addDayToRepeats(String e) {
+    setState(() {
+      if( _task.repeats.contains(e) ) {
+        _task.repeats.removeWhere((d)=> e == d);
+        _task.repeats.toSet().toList();
+      } else {
+        _task.repeats.add(e);
+        _task.repeats.toSet().toList();
+      }
+    });
+  }
+
+
   _addTask(BuildContext context) async {
     _formKey.currentState!.save();
 
