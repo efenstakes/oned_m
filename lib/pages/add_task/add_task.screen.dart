@@ -9,6 +9,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
+import 'package:oned_m/widgets/selectable_chip.widget.dart';
 
 
 class AddTaskScreen extends StatefulWidget {
@@ -230,98 +231,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 40),
 
-
-    
-              // repeats on?
-              Text(
-                "Repeats On",
-                style: Theme.of(context).textTheme.headline6!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                alignment: WrapAlignment.center,
-                runSpacing: 10,
-                spacing: 10,
-                children: [
-                  ...DAYS.map((e) {
-                    return InkWell(
-                      onTap: ()=> _addDayToRepeats(e),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 600),
-                        child: Text(
-                          e,
-                          style: TextStyle(
-                            color: _task.repeats.contains(e) ? Colors.white : Colors.black87,
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 9,
-                          horizontal: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _task.repeats.contains(e) ? Colors.black87 : Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ],
-              ),
-              const SizedBox(height: 40),
-
-
-    
-              // priority
-              Text(
-                "Priority",
-                style: Theme.of(context).textTheme.headline6!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                alignment: WrapAlignment.center,
-                runSpacing: 10,
-                spacing: 10,
-                children: [
-                  ...PROPRITIES.map((e) {
-                    return ChoiceChip(
-                      label: Text(e), 
-                      selected: _task.priority == e,
-                      onSelected: (bool v) {
-                        if( !v ) return; 
-                        setState(()=> _task.priority = e);
-                      },
-                    );
-                    return InkWell(
-                      onTap: ()=> _addDayToRepeats(e),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 600),
-                        child: Text(
-                          e,
-                          style: TextStyle(
-                            color: _task.repeats.contains(e) ? Colors.white : Colors.black87,
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 9,
-                          horizontal: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _task.repeats.contains(e) ? Colors.black87 : Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ],
-              ),
-              const SizedBox(height: 40),
-
-
-
               // tags added
               _task.tags.isEmpty 
                 ? 
@@ -407,6 +316,58 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 60),
 
+    
+              // repeats on?
+              Text(
+                "Repeats On",
+                style: Theme.of(context).textTheme.headline6!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.start,
+                runSpacing: 10,
+                spacing: 10,
+                children: [
+                  ...DAYS.map((e) {
+                    
+                    return SelectableChipWidget(
+                      text: e, 
+                      isSelected: _task.repeats.contains(e), 
+                      onSelect: ()=> _addDayToRepeats(e)
+                    );
+                  }).toList(),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+
+    
+              // priority
+              Text(
+                "Priority",
+                style: Theme.of(context).textTheme.headline6!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.start,
+                runSpacing: 10,
+                spacing: 10,
+                children: [
+                  ...PROPRITIES.map((e) {
+                    
+                    return SelectableChipWidget(
+                      text: e, 
+                      isSelected: _task.priority == e, 
+                      onSelect: ()=> setState(()=> _task.priority = e),
+                    );
+                  }).toList(),
+                ],
+              ),
+              const SizedBox(height: 40),
 
 
               (_error == "" )
