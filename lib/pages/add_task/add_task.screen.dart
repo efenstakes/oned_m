@@ -34,7 +34,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
 
 
-  Task _task = Task( tags: [], project: "Learner" );
+  Task _task = Task( repeats: [], tags: [], project: "Learner" );
 
 
   bool _isLoading = false;
@@ -331,7 +331,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 spacing: 10,
                 children: [
                   ...DAYS.map((e) {
-                    
+
                     return SelectableChipWidget(
                       text: e, 
                       isSelected: _task.repeats.contains(e), 
@@ -343,7 +343,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const SizedBox(height: 40),
 
 
-    
               // priority
               Text(
                 "Priority",
@@ -398,7 +397,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   _isLoading ? "Adding Habit" : "Add Habit"
                 ),
                 icon: _isLoading ? const CircularProgressIndicator(color: Colors.white,) : null,
-                key: const Key("HP:Add Task"),
+                key: const Key("HP:Add Habit"),
               ),
               const SizedBox(height: 80),
 
@@ -411,6 +410,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   
 
   _addDayToRepeats(String e) {
+    print("add day => ${e}");
+
     setState(() {
       if( _task.repeats.contains(e) ) {
         _task.repeats.removeWhere((d)=> e == d);
@@ -420,6 +421,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         _task.repeats.toSet().toList();
       }
     });
+    _task.repeats.forEach((d)=> print("day => ${d}"));
   }
 
 
