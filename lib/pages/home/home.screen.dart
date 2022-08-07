@@ -159,6 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               children: [
                 ..._todayTasks.map((task) { 
+
                   return TaskWidget(
                     task: task,
                     onDelete: () {
@@ -294,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
               var docCompletion = await FirebaseFirestore.instance
                                           .collection("tasks")
                                           .doc(doc.id)
-                                          .collection("repeats")
+                                          .collection("repeats_progress")
                                           .doc(dateString)
                                           .get();
               
@@ -392,7 +393,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _setTaskProgress(Task task, double progress, BuildContext ctx) async {
-    if( task.repeats.isNotEmpty ) {
+    String today = DAYS[(DateTime.now().weekday - 1)];
+
+    if( task.repeats.isNotEmpty && task.repeats.contains(today) ) {
       _setRepeatingTaskProgress(task, progress);
     } else {
       _setInTaskProgress(task, progress);
@@ -402,31 +405,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _setInTaskProgress(Task task, double progress) async {
+    print("_setInTaskProgress");
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
               .doc(task.id)
               .update({ "progress": progress });
     } catch (e) {
-      
+      print("_setInTaskProgress error ${e.toString()}");
     }
   }
 
   _setRepeatingTaskProgress(Task task, double progress) async {
+    print("_setRepeatingTaskProgress ");
+    
     String dateString = Jiffy(DateTime.now()).format("yyyy-MM-d");
-
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
               .doc(task.id)
-              .collection("repeats")
+              .collection("repeats_progress")
               .doc(dateString)
               .set({
                 "date": dateString,
                 "progress": progress,
               });
     } catch (e) {
-      
+      print("_setRepeatingTaskProgress error ${e.toString()}");
     }
   }
 
