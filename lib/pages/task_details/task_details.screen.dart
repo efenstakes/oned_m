@@ -6,6 +6,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/home/progress_picker.dart';
 import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
+import 'package:oned_m/widgets/selectable_chip.widget.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
@@ -25,8 +26,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     // TODO: implement initState
     super.initState();
 
+    String today = DAYS[(DateTime.now().weekday - 1)];
+    
 
-    updateProgressTo(widget.task.progress);
+    double inIntrestProgress = widget.task.progress;
+
+    if( widget.task.repeats.contains(today) ) {
+      inIntrestProgress = widget.task.completion?['progress'] ?? 0.0;
+    }
+
+    updateProgressTo(inIntrestProgress);
         
   }
 
@@ -120,7 +129,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           // title
           Text(
             task.title!,
-            style: Theme.of(context).textTheme.headline2!.copyWith(
+            style: Theme.of(context).textTheme.headline3!.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
@@ -155,6 +164,50 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
           const SizedBox(height: 40),
 
+          // priotity
+          Text(
+            "PRIORITY",
+            style: Theme.of(context).textTheme.headline6!.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            task.priority,
+            style: Theme.of(context).textTheme.headline5!,
+          ),
+          const SizedBox(height: 40),
+
+
+          // repeats on
+          task.repeats.isNotEmpty 
+            ?
+              Text(
+                "REPEATS ON",
+                style: Theme.of(context).textTheme.headline6!.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              )
+            : Container(),
+          task.repeats.isNotEmpty ? const SizedBox(height: 8) : const SizedBox.shrink(),
+          Wrap(
+            alignment: WrapAlignment.start,
+            runSpacing: 10,
+            spacing: 10,
+            children: [
+              ...task.repeats.map((tag) {
+
+                return SelectableChipWidget(
+                  text: tag, 
+                  isSelected: true, 
+                  onSelect: (){}
+                );
+              }).toList(),
+            ],
+          ),
+          const SizedBox(height: 80),
+
+
           // tags
           task.tags.isNotEmpty 
             ?
@@ -165,25 +218,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
               )
             : Container(),
+          task.tags.isNotEmpty ? const SizedBox(height: 8) : const SizedBox.shrink(),
           Wrap(
             alignment: WrapAlignment.start,
             runSpacing: 10,
             spacing: 10,
             children: [
               ...task.tags.map((tag) {
-                return Chip(
-                  label: Text(tag),
-                  labelStyle: const TextStyle(
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 9,
-                    horizontal: 16,
-                  ),
-                  backgroundColor: Colors.black87,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                
+                return SelectableChipWidget(
+                  text: tag, 
+                  isSelected: true, 
+                  onSelect: (){}
                 );
               }).toList(),
             ],
@@ -211,9 +257,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                             child: Text("Cancel"),
                           ),
                           FloatingActionButton.extended(
-                            key: Key("TDS:Delete Task FAB"),
+                            key: const Key("TDS:Delete Task FAB"),
                             onPressed: ()=> _deleteTask(task, ctx), 
-                            label: Text("Delete"),
+                            label: const Text("Delete"),
+                            elevation: 0,
                           ),
                         ],
                       );
@@ -222,7 +269,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 },
                 icon: const Icon(Icons.delete_outline_outlined),
                 elevation: 0,
-                key: const Key("TDS:delete"),
+                key: const Key("TDS:DELETE_BTDSFAB"),
                 backgroundColor: Color.fromARGB(255, 229, 101, 98),
                 // extendedPadding: const EdgeInsets.symmetric(horizontal: 32)
               ),
@@ -241,7 +288,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 },
                 icon: const Icon(Icons.stacked_bar_chart_rounded),
                 elevation: 0,
-                key: const Key("TDS:set status"),
+                key: const Key("TDS:TDS_setstatus"),
                 backgroundColor: Colors.greenAccent[800],
                 // extendedPadding: const EdgeInsets.symmetric(horizontal: 32)
               ),
@@ -251,7 +298,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 icon: const Icon(Icons.done_all),
                 // mini: true,
                 elevation: 0,
-                key: const Key("TDS:done"),
+                key: const Key("TDS:TDS_done"),
                 backgroundColor: Color.fromARGB(255, 21, 118, 25),
                 // extendedPadding: const EdgeInsets.symmetric(horizontal: 32)
               ),
@@ -277,6 +324,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         hoverElevation: 0,
         focusElevation: 0,
         highlightElevation: 0,
+        key: const Key("PLAY_IT"),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -286,7 +334,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   
   void updateProgressTo(double val) {
     Timer.periodic(
-      Duration(milliseconds: 5), 
+      const Duration(milliseconds: 5), 
       (Timer t){
         if( _progressNofier.value >= val ) {
           t.cancel();
@@ -296,37 +344,58 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
+ 
   _setTaskAsDone(Task task) async {
-    try {
-      await FirebaseFirestore.instance
-              .collection("tasks")
-              .doc(task.id)
-              .update({ "progress": 100 });
-              
-      updateProgressTo(100);
-    } catch (e) {
-      
+    if( task.repeats.isNotEmpty ) {
+      _setRepeatingTaskProgress(task, 100);
+    } else {
+      _setInTaskProgress(task, 100);
     }
   }
 
-
   _setTaskProgress(Task task, double progress, BuildContext ctx) async {
+    String today = DAYS[(DateTime.now().weekday - 1)];
+
+    if( task.repeats.isNotEmpty && task.repeats.contains(today) ) {
+      _setRepeatingTaskProgress(task, progress);
+    } else {
+      _setInTaskProgress(task, progress);
+    }
+    
+    Navigator.pop(ctx);
+  }
+
+  _setInTaskProgress(Task task, double progress) async {
+    print("_setInTaskProgress");
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
               .doc(task.id)
               .update({ "progress": progress });
-              
-              
-      if( task.progress == 100 ) {
-        _progressNofier.value = 0;
-      }
-      updateProgressTo(progress);
     } catch (e) {
-      
+      print("_setInTaskProgress error ${e.toString()}");
     }
-    Navigator.pop(ctx);
   }
+
+  _setRepeatingTaskProgress(Task task, double progress) async {
+    print("_setRepeatingTaskProgress ");
+    
+    String dateString = Jiffy(DateTime.now()).format("yyyy-MM-d");
+    try {
+      await FirebaseFirestore.instance
+              .collection("tasks")
+              .doc(task.id)
+              .collection("repeats_progress")
+              .doc(dateString)
+              .set({
+                "date": dateString,
+                "progress": progress,
+              });
+    } catch (e) {
+      print("_setRepeatingTaskProgress error ${e.toString()}");
+    }
+  }
+
 
 
   _deleteTask(Task task, BuildContext ctx) async {
