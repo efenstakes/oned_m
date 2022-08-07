@@ -2,6 +2,14 @@
 
 import 'package:jiffy/jiffy.dart';
 
+
+const String R_DAILY = "DAILY";
+const String R_WEEKDAYS = "WEEKDAYS";
+const String R_WEEKENDS = "WEEKENDS";
+const List<String> DAYS = [ "M", "T", "W", "T", "F", "S", "S" ];
+const List<String> PROPRITIES = [ "LOW", "MEDIUM", "HIGH" ];
+
+
 class Task {
   String? id;
   String? title;
@@ -12,6 +20,9 @@ class Task {
   DateTime? deadline;
   double progress;
 
+  List<String> repeats;
+  String priority;
+
   Task({
     this.id, 
     this.description, 
@@ -20,7 +31,9 @@ class Task {
     required this.project, 
     this.startDate, 
     this.deadline,
-    this.progress = 0
+    this.progress = 0,
+    this.repeats = const [],
+    this.priority = "MEDIUM"
   });
 
 
@@ -31,7 +44,9 @@ class Task {
       title: task["title"],
       description: task["description"],
       project: task["project"],
+      priority: task["priority"],
       tags: [ ...task["tags"] ],
+      repeats: [ ...task["repeats"] ],
       progress: task["progress"] / 1.0,
       startDate: DateTime.tryParse(task["startDate"]),
       deadline: DateTime.tryParse(task["deadline"])
@@ -44,7 +59,9 @@ class Task {
       "title": title,
       "description": description,
       "project": project,
+      "priority": priority,
       "tags": tags,
+      "repeats": repeats,
       "progress": progress,
       "startDate": Jiffy(startDate).format("yyyy-MM-d"),
       "deadline": Jiffy(deadline).format("yyyy-MM-d"),
