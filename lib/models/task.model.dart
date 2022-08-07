@@ -6,7 +6,7 @@ import 'package:jiffy/jiffy.dart';
 const String R_DAILY = "DAILY";
 const String R_WEEKDAYS = "WEEKDAYS";
 const String R_WEEKENDS = "WEEKENDS";
-const List<String> DAYS = [ "M", "T", "W", "T", "F", "S", "S" ];
+const List<String> DAYS = [ "M", "T", "W", "T", "F", "St", "Sn" ];
 const List<String> PROPRITIES = [ "LOW", "MEDIUM", "HIGH" ];
 
 
@@ -32,7 +32,7 @@ class Task {
     this.startDate, 
     this.deadline,
     this.progress = 0,
-    this.repeats = const [],
+    required this.repeats,
     this.priority = "MEDIUM"
   });
 
@@ -86,7 +86,8 @@ List<Task> testTasks = [
         "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown",
     title: "title",
     tags: [ "hola", "hey" ],
-    project: "Maven"
+    project: "Maven",
+    repeats: [],
   ),
   new Task(
     id: "2",
@@ -94,7 +95,8 @@ List<Task> testTasks = [
         "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown",
     title: "title",
     tags: [ "hola", "hey" ],
-    project: "Bright NFT"
+    project: "Bright NFT",
+    repeats: [],
   ),
   new Task(
     id: "3",
@@ -102,7 +104,8 @@ List<Task> testTasks = [
         "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown",
     title: "title",
     tags: [ "hola", "hey" ],
-    project: "Maven"
+    project: "Maven",
+    repeats: [],
   ),
   new Task(
     id: "4",
@@ -110,7 +113,8 @@ List<Task> testTasks = [
         "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown",
     title: "title",
     tags: [ "hola", "hey" ],
-    project: "Bright NFT"
+    project: "Bright NFT",
+    repeats: [],
   ),
   new Task(
     id: "5",
@@ -118,7 +122,8 @@ List<Task> testTasks = [
         "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown",
     title: "title",
     tags: [ "hola", "hey" ],
-    project: "Volken"
+    project: "Volken",
+    repeats: [],
   ),
   new Task(
     id: "6",
@@ -126,6 +131,7 @@ List<Task> testTasks = [
         "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown",
     title: "title",
     tags: [ "hola", "hey" ],
-    project: "Maven"
+    project: "Maven",
+    repeats: [],
   ),
 ];
