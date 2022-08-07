@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 
 
@@ -77,7 +78,7 @@ class _ProgressPickerWidgetState extends State<ProgressPickerWidget> {
         ),
         FloatingActionButton.extended(
           key: Key("SetProgress FAB"),
-          onPressed: ()=> _setTaskProgress(widget.task.id!, _currentSlidingValue, context), 
+          onPressed: ()=> _setTaskProgress(widget.task, _currentSlidingValue, context), 
           label: Text("Set Progress"),
           elevation: 0,
         ),
@@ -86,16 +87,52 @@ class _ProgressPickerWidgetState extends State<ProgressPickerWidget> {
   }
 
   
-  _setTaskProgress(String taskId, double progress, BuildContext ctx) async {
+
+  _setTaskProgress(Task task, double progress, BuildContext ctx) async {
+    String today = DAYS[(DateTime.now().weekday - 1)];
+
+    if( task.repeats.isNotEmpty && task.repeats.contains(today) ) {
+      _setRepeatingTaskProgress(task, progress);
+    } else {
+      _setInTaskProgress(task, progress);
+    }
+    
+    Navigator.pop(ctx);
+  }
+
+  _setInTaskProgress(Task task, double progress) async {
+    print("_setInTaskProgress");
     try {
       await FirebaseFirestore.instance
               .collection("tasks")
-              .doc(taskId)
+              .doc(task.id)
               .update({ "progress": progress });
     } catch (e) {
-      
+      print("_setInTaskProgress error ${e.toString()}");
     }
-    setState(()=> _currentSlidingValue = 0);
-    Navigator.pop(ctx);
   }
+
+  _setRepeatingTaskProgress(Task task, double progress) async {
+    print("_setRepeatingTaskProgress ");
+    
+    String dateString = Jiffy(DateTime.now()).format("yyyy-MM-d");
+    try {
+      await FirebaseFirestore.instance
+              .collection("tasks")
+              .doc(task.id)
+              .collection("repeats_progress")
+              .doc(dateString)
+              .set({
+                "date": dateString,
+                "progress": progress,
+              });
+    } catch (e) {
+      print("_setRepeatingTaskProgress error ${e.toString()}");
+    }
+  }
+
+
+
+
+  
 }
