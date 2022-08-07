@@ -30,10 +30,10 @@ class SelectableChipWidget extends StatelessWidget {
           horizontal: 16,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.black87 : Colors.white,
+          color: isSelected ? Colors.brown : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected ? Colors.transparent : Colors.black87,
+            color: isSelected ? Colors.transparent : Colors.brown,
             width: 1,
           )
         ),
