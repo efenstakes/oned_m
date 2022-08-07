@@ -6,7 +6,7 @@ import 'package:jiffy/jiffy.dart';
 const String R_DAILY = "DAILY";
 const String R_WEEKDAYS = "WEEKDAYS";
 const String R_WEEKENDS = "WEEKENDS";
-const List<String> DAYS = [ "M", "T", "W", "T", "F", "St", "Sn" ];
+const List<String> DAYS = [ "Mon", "Tue", "Wed", "Thr", "Fri", "Sat", "Sun" ];
 const List<String> PROPRITIES = [ "LOW", "MEDIUM", "HIGH" ];
 
 
