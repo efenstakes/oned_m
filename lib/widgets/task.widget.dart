@@ -19,14 +19,7 @@ class TaskWidget extends StatefulWidget {
 class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
-    Color? color = Colors.green[900];
-
-    if( widget.task.progress > 0 && widget.task.progress < 100 ) {
-      color = Colors.blue[400];
-    } 
-    if( widget.task.progress != 100 && Jiffy(widget.task.deadline).isBefore(Jiffy()) ) {
-      color = Colors.orange[300];
-    }
+    Color? color = _getCompletionState();
 
     return InkWell(
       onTap: ()=> Navigator.of(context).push(
@@ -116,5 +109,40 @@ class _TaskWidgetState extends State<TaskWidget> {
         ),
       ),
     );
+  }
+
+
+  Color? _getCompletionState() {
+    // print("_getCompletionState");
+    
+    String today = DAYS[(DateTime.now().weekday - 1)];
+    String dateString = Jiffy(DateTime.now()).format("yyyy-MM-d");
+
+    // print("today $today widget.task.repeats ${widget.task.repeats.join(", ")}");
+
+    if( widget.task.repeats.contains(today) ) {
+      return _getCompletionColor(
+        widget.task.completion?['progress'] ?? 0.0, 
+        Jiffy(DateTime.now()).add(years: 1).dateTime
+      );
+    } else {
+      return _getCompletionColor(widget.task.progress, widget.task.deadline ?? DateTime.now());
+    }
+  }
+
+  Color? _getCompletionColor(double progress, DateTime deadline) {
+    Color? color = Colors.green[900];
+
+    if( progress == 0 ) {
+      color = Colors.brown;
+    } 
+    if( progress > 0 && progress < 100 ) {
+      color = Colors.blue[400];
+    } 
+    if( progress != 100 && Jiffy(deadline).isBefore(Jiffy()) ) {
+      color = Colors.orange[300];
+    }
+
+    return color;
   }
 }
