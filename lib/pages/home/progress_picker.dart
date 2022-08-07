@@ -72,16 +72,19 @@ class _ProgressPickerWidgetState extends State<ProgressPickerWidget> {
         ),
       ),
       actions: [
+        
         TextButton(
           onPressed: ()=> Navigator.pop(context), 
-          child: Text("Cancel"),
+          child: const Text("Cancel"),
         ),
+
         FloatingActionButton.extended(
-          key: Key("SetProgress FAB"),
+          key: const Key("PCK:SET_PROGRESS_FAB"),
           onPressed: ()=> _setTaskProgress(widget.task, _currentSlidingValue, context), 
-          label: Text("Set Progress"),
+          label: const Text("Set Progress"),
           elevation: 0,
         ),
+        
       ],
     );
   }
