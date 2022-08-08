@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/widgets/selectable_chip.widget.dart';
+import 'package:time_pickerr/time_pickerr.dart';
 
 
 class AddTaskScreen extends StatefulWidget {
@@ -343,6 +344,46 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const SizedBox(height: 40),
 
 
+              // Set Alart At Time
+              Text(
+                "Set Alert At Time",
+                style: Theme.of(context).textTheme.headline6!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              InkWell(
+                onTap: (){
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CustomHourPicker(
+                        elevation: 2,
+                        onPositivePressed: (context, time) {
+                          print('onPositive ${time}');
+                          setState(()=> _task.repeatTime = "${time.hour}:${time.minute}" );
+                          Navigator.of(context).pop();
+                        },
+                        onNegativePressed: (context) {
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                  ),
+                  child: Text(
+                    _task.repeatTime ?? "Select Time",
+                    style: Theme.of(context).textTheme.headline6!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+
               // priority
               Text(
                 "Priority",
@@ -475,7 +516,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         fontSize: 16.0
       );
       await Future.delayed(
-        const Duration(milliseconds: 2500),
+        const Duration(milliseconds: 5500),
         ()=> Navigator.of(context).pop(),
       );
     } catch(e) {
