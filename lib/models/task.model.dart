@@ -21,6 +21,7 @@ class Task {
   double progress;
 
   List<String> repeats;
+  String? repeatTime;
   String priority;
 
   Map<String, double>? completion;
@@ -35,6 +36,7 @@ class Task {
     this.startDate, 
     this.deadline,
     this.progress = 0,
+    this.repeatTime,
     required this.repeats,
     this.priority = "MEDIUM",
   });
@@ -52,7 +54,8 @@ class Task {
       repeats: [ ...task["repeats"] ],
       progress: task["progress"] / 1.0,
       startDate: DateTime.tryParse(task["startDate"]),
-      deadline: DateTime.tryParse(task["deadline"])
+      deadline: DateTime.tryParse(task["deadline"]),
+      repeatTime: task["repeatTime"]
     );
   }
 
@@ -68,6 +71,7 @@ class Task {
       "progress": progress,
       "startDate": Jiffy(startDate).format("yyyy-MM-d"),
       "deadline": Jiffy(deadline).format("yyyy-MM-d"),
+      "repeatTime": repeatTime,
     };
   }
 
