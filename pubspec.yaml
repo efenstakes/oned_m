@@ -44,6 +44,9 @@ dependencies:
   ai_progress: ^2.0.0
   fluttertoast: ^8.0.9
   http: ^0.13.4
+  android_alarm_manager_plus: ^2.0.6
+  flutter_alarm_clock: ^0.0.2
+  time_pickerr: ^1.0.6
 
 dev_dependencies:
   flutter_test:
