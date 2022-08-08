@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
@@ -492,20 +493,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         'user': FirebaseAuth.instance.currentUser?.uid,
       });
 
-      // var snackBar = SnackBar(
-      //   content: const Center(child: const Text("Task Added Successfully")),
-      //   backgroundColor: Colors.green[700],
-      //   duration: const Duration(milliseconds: 500),
-      //   padding: const EdgeInsets.symmetric(
-      //     vertical: 10, horizontal: 16,
-      //   ),
-      //   margin: EdgeInsets.symmetric(
-      //     vertical: MediaQuery.of(context).size.height/20, 
-      //     horizontal: MediaQuery.of(context).size.height/10,
-      //   ),
-      // );
-      // // ignore: use_build_context_synchronously
-      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      if( _task.repeatTime != null ) {
+            try {
+              // Create an alarm at 23:59
+              FlutterAlarmClock.createAlarm(21, 04, title: "Sup Mate, No Animosity");
+            } catch (e) {
+              print("ERROR FlutterAlarmClock.createAlarm(23, 59); ${e.toString()}");
+            }
+      }
+      
       Fluttertoast.showToast(
         msg: "Habit Added Successfully",
         toastLength: Toast.LENGTH_SHORT,
