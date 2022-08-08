@@ -495,8 +495,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
       if( _task.repeatTime != null ) {
             try {
-              // Create an alarm at 23:59
-              FlutterAlarmClock.createAlarm(21, 04, title: "Sup Mate, No Animosity");
+              // Create an alarm for the time given
+              int hr = int.parse( _task.repeatTime!.split(":")[0] );
+              int min = int.parse( _task.repeatTime!.split(":")[1] );
+              FlutterAlarmClock.createAlarm(hr, min, title: _task.title!);
             } catch (e) {
               print("ERROR FlutterAlarmClock.createAlarm(23, 59); ${e.toString()}");
             }
