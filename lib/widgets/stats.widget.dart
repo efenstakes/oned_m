@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 
 class StatsWidget extends StatelessWidget {
@@ -21,6 +18,7 @@ class StatsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
         Text(
@@ -29,6 +27,8 @@ class StatsWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
         ),
+        const SizedBox(height: 4),
+
         Wrap(
           direction: Axis.horizontal,
           alignment: WrapAlignment.start,
