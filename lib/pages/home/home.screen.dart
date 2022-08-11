@@ -1,25 +1,16 @@
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/add_task/add_task.screen.dart';
 import 'package:oned_m/pages/home/progress_picker.dart';
 import 'package:oned_m/pages/home/quote_of_the_day.widget.dart';
-import 'package:oned_m/pages/login_register/login_register.screen.dart';
-import 'package:oned_m/pages/task_ongoing/task_ongoing.screen.dart';
-import 'package:oned_m/widgets/no_tasks.widget.dart';
+import 'package:oned_m/widgets/no_content.widget.dart';
 import 'package:oned_m/widgets/selectable_chip.widget.dart';
-import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/stats.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
-import 'package:oned_m/widgets/tasks_loading.widget.dart';
+import 'package:oned_m/widgets/content_loading.widget.dart';
 
 
 
@@ -68,180 +59,132 @@ class _HomeScreenState extends State<HomeScreen> {
     int taskNumber = (screenSize.width / 320).toInt();
 
 
-    return Scaffold(
-      appBar: AppBar(
-        title: null,
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          Hero(
-            tag: const Key("PLAY_IT"),
-            child: IconButton(
-              onPressed: ()=> Navigator.of(context).push(
-                MaterialPageRoute(builder: (ctx)=> TaskOngoingScreen(task: null))
-              ), 
-              icon: const Icon(Icons.play_arrow_rounded),
-              color: Colors.black87,
-            ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: ListView(
+        children: [
+          const SizedBox(height: 40),
+
+          const QuoteOfTheDayWidget(),
+          
+          // stats
+          StatsWidget(
+            done: _allTasks.where((t) => t.progress == 100).length, 
+            onGoing: _allTasks.where((t) => t.progress < 100).length, 
+            close: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1)) ).length, 
+            later: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isAfter(Jiffy())).length,
           ),
-          IconButton(
-            onPressed: ()=> _logOut(), 
-            icon: const Icon(Icons.logout_outlined),
-            color: Colors.black87,
-          ),
-        ],
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: ListView(
-          children: [
-            const SizedBox(height: 40),
+          const SizedBox(height: 60),
 
-            const QuoteOfTheDayWidget(),
-            
-            // stats
-            StatsWidget(
-              done: _allTasks.where((t) => t.progress == 100).length, 
-              onGoing: _allTasks.where((t) => t.progress < 100).length, 
-              close: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isBefore(Jiffy().add(weeks: 1)) ).length, 
-              later: _allTasks.where((t) => t.progress < 100 && Jiffy(t.deadline).isAfter(Jiffy())).length,
+          // _projects
+          ( _projects.length > 1 ) 
+            ?
+              Wrap(
+                alignment: WrapAlignment.center,
+                runSpacing: 0,
+                spacing: 10,
+                children: [
+                  ..._projects.map((e) {
+                    
+                    return SelectableChipWidget(
+                      text: e, 
+                      isSelected: _selectedProject != e, 
+                      onSelect: () => setState(() {
+                        _selectedProject = e;
+                        _todayTasks = (e == "All") ? _allTodayTasks : _allTodayTasks.where((t) => t.project == _selectedProject).toList();
+                      })
+                    );
+                  }).toList(),
+                ],
+              )
+            : Container(),
+
+
+          ( !_isLoadingTasks && _allTodayTasks.isEmpty ) 
+            ?
+              NoContentWidget(
+                title: "No Habit",
+                text: "No habits for today. You can click on the add button to add one.",
+                ctaText: "Add Habit",
+                showCta: true,
+                onPressCta: () {
+                  showModalBottomSheet(
+                    isScrollControlled: true,
+                    isDismissible: true,
+                    context: context, 
+                    builder: (context) {
+                      return const AddTaskScreen();
+                    },
+                  );
+                }
+              )
+            : Container(),
+
+          ( _isLoadingTasks )
+            ? ContentLoadingWidget(text: "Loading Habits")
+            : Container(),
+
+          const SizedBox(height: 40),
+          GridView(
+            physics: const ScrollPhysics(),
+            primary: true,
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: taskNumber,
+              childAspectRatio: 2.2,
             ),
-            const SizedBox(height: 60),
+            children: [
+              ..._todayTasks.map((task) { 
 
-            // _projects
-            ( _projects.length > 1 ) 
-              ?
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  runSpacing: 0,
-                  spacing: 10,
-                  children: [
-                    ..._projects.map((e) {
-                      
-                      return SelectableChipWidget(
-                        text: e, 
-                        isSelected: _selectedProject != e, 
-                        onSelect: () => setState(() {
-                          _selectedProject = e;
-                          _todayTasks = (e == "All") ? _allTodayTasks : _allTodayTasks.where((t) => t.project == _selectedProject).toList();
-                        })
-                      );
-                    }).toList(),
-                  ],
-                )
-              : Container(),
+                return TaskWidget(
+                  task: task,
+                  onDelete: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) {
 
+                        return AlertDialog(
+                          title: const Text('Delete?'),
+                          content: const Text('Are you sure you want to delete this task?'),
+                          actions: [
+                            TextButton(
+                              onPressed: ()=> Navigator.pop(ctx), 
+                              child: Text("Cancel"),
+                            ),
+                            FloatingActionButton.extended(
+                              key: Key("Delete Task FAB"),
+                              onPressed: ()=> _deleteTask(task, ctx), 
+                              label: Text("Delete"),
+                            ),
+                          ],
+                        );
+                      }
+                    );
+                  },
+                  onDone: ()=> _setTaskAsDone(task),
+                  onProgress: () {
 
-            ( !_isLoadingTasks && _allTodayTasks.isEmpty ) 
-              ?
-                NoTasksWidget(
-                  addTask: () {
-                    showModalBottomSheet(
-                      isScrollControlled: true,
-                      isDismissible: true,
-                      context: context, 
-                      builder: (context) {
-                        return const AddTaskScreen();
-                      },
+                    showDialog(
+                      context: context,
+                      builder: (ctx) {
+
+                        return ProgressPickerWidget(
+                          task: task
+                        );
+                      }
                     );
                   }
-                )
-              : Container(),
+                );
+              }).toList(),
+            ],
+          ),
+          const SizedBox(height: 120),
 
-            ( _isLoadingTasks )
-              ? const TasksLoadingWidget()
-              : Container(),
-
-            const SizedBox(height: 40),
-            GridView(
-              physics: const ScrollPhysics(),
-              primary: true,
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: taskNumber,
-                childAspectRatio: 2.2,
-              ),
-              children: [
-                ..._todayTasks.map((task) { 
-
-                  return TaskWidget(
-                    task: task,
-                    onDelete: () {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) {
-
-                          return AlertDialog(
-                            title: const Text('Delete?'),
-                            content: const Text('Are you sure you want to delete this task?'),
-                            actions: [
-                              TextButton(
-                                onPressed: ()=> Navigator.pop(ctx), 
-                                child: Text("Cancel"),
-                              ),
-                              FloatingActionButton.extended(
-                                key: Key("Delete Task FAB"),
-                                onPressed: ()=> _deleteTask(task, ctx), 
-                                label: Text("Delete"),
-                              ),
-                            ],
-                          );
-                        }
-                      );
-                    },
-                    onDone: ()=> _setTaskAsDone(task),
-                    onProgress: () {
-
-                      showDialog(
-                        context: context,
-                        builder: (ctx) {
-
-                          return ProgressPickerWidget(
-                            task: task
-                          );
-                        }
-                      );
-                    }
-                  );
-                }).toList(),
-              ],
-            ),
-            const SizedBox(height: 120),
-
-
-          ],
-        ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-
-          showModalBottomSheet(
-            isScrollControlled: true,
-            isDismissible: true,
-            context: context, 
-            builder: (context) {
-              return const AddTaskScreen();
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-        mini: false,
-        backgroundColor: Colors.black87,
-        elevation: 0,
-        hoverElevation: 0,
-        focusElevation: 0,
-        highlightElevation: 0,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  
-
-  Future<void> _logOut() async {
-    FirebaseAuth.instance.signOut();
-  }
 
   _getTasks() async {
     await _getTasksForToday();
