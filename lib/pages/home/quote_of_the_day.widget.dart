@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:http/http.dart' as http;
 import 'package:oned_m/models/quote.model.dart';
 
@@ -38,20 +36,21 @@ class _QuoteOfTheDayWidgetState extends State<QuoteOfTheDayWidget> {
         top: 20, bottom: 40,
       ),
       padding: const EdgeInsets.symmetric(
-        vertical: 20, horizontal: 10,
+        vertical: 20, horizontal: 16,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.black54, // Colors.brown[400],
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
           Text(
             _quote?.text ?? "Hola", 
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
               color: Colors.white70,
-              fontSize: 24
+              fontSize: 18,
             ),
           ),
 
