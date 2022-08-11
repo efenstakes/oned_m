@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:oned_m/pages/home/home.screen.dart';
 import 'package:oned_m/pages/login_register/login_register.screen.dart';
+import 'package:oned_m/pages/menu/menu.screen.dart';
 
 
 Future<void> main() async {
@@ -51,13 +50,12 @@ class MyApp extends StatelessWidget {
         builder: (ctx, snapshot) {
 
           if( snapshot.hasData ) {
-            return HomeScreen();
+            return const MenuScreen();
           }
 
-          return LoginRegisterScreen();
+          return const LoginRegisterScreen();
         },
       ),
-      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
