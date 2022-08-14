@@ -36,7 +36,7 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    int noteNumber = (screenSize.width / 320).toInt();
+    int noteNumber = screenSize.width ~/ 320;
 
 
     return ListView(
@@ -104,7 +104,7 @@ class _NotesScreenState extends State<NotesScreen> {
           
           setState(() {
             _allNotes = nts;
-            _isLoadingNotes: false;
+            _isLoadingNotes = false;
           });
           
         });
