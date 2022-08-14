@@ -2,16 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:oned_m/models/note.model.dart';
 import 'package:rich_editor/rich_editor.dart';
 
 
 
 class AddNoteScreen extends StatefulWidget {
   bool isInScreen;
+  final Note? note;
 
   AddNoteScreen({
     Key? key,
     this.isInScreen = false,
+    this.note,
   }) : super(key: key);
 
   @override
@@ -31,6 +34,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   void initState() {
     super.initState();
 
+    // _titleInputController.text = (widget.note != null && widget.note?.text != null) ? widget.note?.text ?? "" : "";
+    _titleInputController.text = widget.note?.title ?? "";
+
     _titleFocusNode.addListener(() {
       
     });
@@ -49,7 +55,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       return WillPopScope(
         child: RichEditor(
           key: keyEditor,
-          value: 'Add your notes',
+          value: widget.note?.text ?? "",
           editorOptions: RichEditorOptions(
             placeholder: 'Try typing',
             // backgroundColor: Colors.blueGrey, // Editor's bg color
@@ -113,7 +119,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
         ),
         body: RichEditor(
           key: keyEditor,
-          value: 'Add your notes',
+          value: widget.note?.text ?? "",
           editorOptions: RichEditorOptions(
             placeholder: 'Try typing',
             // backgroundColor: Colors.blueGrey, // Editor's bg color
@@ -149,19 +155,34 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     var note = await keyEditor.currentState?.getHtml();
     var title = _titleInputController.text;
 
-    try {
-      var noteRef = FirebaseFirestore.instance.collection("notes").doc();
 
-      noteRef.set({
-        'id': noteRef.id,
-        'title': title,
-        'note': note,
-        'user': FirebaseAuth.instance.currentUser?.uid,
-      }).then((value) {
-        // if ( widget.isInScreen ) {
+    try {
+      
+      if( widget.note != null ) {
+
+        FirebaseFirestore.instance.collection("notes")
+                  .doc(widget.note?.id)
+                  .update({
+                    "note": "note",
+                    "title": title,
+                  }).then((value) {
+                    Navigator.of(context).pop();
+                  });
+
+      } else {
+
+        var noteRef = FirebaseFirestore.instance.collection("notes").doc();
+
+        noteRef.set({
+          'id': noteRef.id,
+          'title': title,
+          'note': note,
+          'user': FirebaseAuth.instance.currentUser?.uid,
+        }).then((value) {
           Navigator.of(context).pop();
-        // }
-      });
+        });
+
+      }
 
     } catch (e) {
       if (kDebugMode) {
