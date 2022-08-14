@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_native_html_view/flutter_native_html_view.dart';
 import 'package:oned_m/models/note.model.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:oned_m/pages/note/note.screen.dart';
 
 
 
@@ -19,11 +20,11 @@ class _NoteWidgetState extends State<NoteWidget> {
   Widget build(BuildContext context) {
     
     return InkWell(
-      // onTap: ()=> Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //     builder: (ctxt)=> NoteDetailPage(note: widget.note,)
-      //   )
-      // ),
+      onTap: ()=> Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctxt)=> NoteScreen(note: widget.note,)
+        )
+      ),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
