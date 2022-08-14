@@ -69,7 +69,7 @@ class _NotesScreenState extends State<NotesScreen> {
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: noteNumber,
-            childAspectRatio: 2.2,
+            childAspectRatio: 3.2,
           ),
           children: [
             ..._allNotes.map((note) { 
