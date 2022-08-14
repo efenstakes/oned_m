@@ -34,7 +34,8 @@ class _TaskWidgetState extends State<TaskWidget> {
         child: Container(
           padding: const EdgeInsets.all(8),
           constraints: const BoxConstraints(
-            maxHeight: 200,
+            maxHeight: 240,
+            minWidth: 240,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -45,7 +46,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.task.title!,
+                    widget.task.title ?? "",
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -65,7 +66,7 @@ class _TaskWidgetState extends State<TaskWidget> {
 
               // description
               Text(
-                widget.task.description!,
+                widget.task.description ?? "",
                 style: Theme.of(context).textTheme.bodyLarge,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
