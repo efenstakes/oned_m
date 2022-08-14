@@ -158,9 +158,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
         'note': note,
         'user': FirebaseAuth.instance.currentUser?.uid,
       }).then((value) {
-        if ( widget.isInScreen ) {
+        // if ( widget.isInScreen ) {
           Navigator.of(context).pop();
-        }
+        // }
       });
 
     } catch (e) {
