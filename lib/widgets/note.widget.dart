@@ -45,12 +45,14 @@ class _NoteWidgetState extends State<NoteWidget> {
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 6),
               
               // note
               LimitedBox(
-                maxHeight: 64,
+                maxHeight: 84,
                 child: Html(
                   data: widget.note.text!
                 ),
