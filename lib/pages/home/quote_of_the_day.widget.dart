@@ -79,8 +79,14 @@ class _QuoteOfTheDayWidgetState extends State<QuoteOfTheDayWidget> {
       // print("response.body ${response.body}");
       int randomIndex = Random().nextInt(jsonDecode(response.body).length);
       Quote qote = Quote.fromMap(jsonDecode(response.body)[randomIndex]);
-            
+      
       print("qote ${qote.text}");
+
+      if( qote.text == null ) {
+        print("quote is null");
+        return;
+      }
+      
       setState(() {
         _quote = qote;
       });
