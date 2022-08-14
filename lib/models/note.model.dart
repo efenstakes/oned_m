@@ -17,7 +17,7 @@ class Note {
     return Note(
       id: map['id'],
       title: map['title'],
-      text: map['text'], 
+      text: map['note'], 
     );
   }
 
