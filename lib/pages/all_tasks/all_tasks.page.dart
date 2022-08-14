@@ -7,6 +7,8 @@ import 'package:oned_m/models/task.model.dart';
 import 'package:oned_m/pages/add_task/add_task.screen.dart';
 import 'package:oned_m/pages/home/progress_picker.dart';
 import 'package:oned_m/pages/home/quote_of_the_day.widget.dart';
+import 'package:oned_m/widgets/content_loading.widget.dart';
+import 'package:oned_m/widgets/no_content.widget.dart';
 import 'package:oned_m/widgets/stat_card.widget.dart';
 import 'package:oned_m/widgets/task.widget.dart';
 
@@ -147,85 +149,31 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
 
           ( !_isLoadingTasks && _tasks.isEmpty ) 
             ?
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: 120
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20, horizontal: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.brown[200],
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-
-                    Text(
-                      "No Tasks", 
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text("Click the add button to add a task", style: TextStyle(), textAlign: TextAlign.center,),
-                    SizedBox(height: 20),
-
-                    FloatingActionButton.extended(
-                      elevation: 0,
-                      focusElevation: 0,
-                      hoverElevation: 0,
-                      onPressed: () {
-                        showModalBottomSheet(
-                          isScrollControlled: true,
-                          isDismissible: true,
-                          context: context, 
-                          builder: (context) {
-                            return AddTaskScreen();
-                          },
-                        );
-                      }, 
-                      label: const Text("Add Task"),
-                      icon: const Icon(Icons.add),
-                      key: const Key("HP:Add Task"),
-                    ),
-                  ],
-                ),
+              NoContentWidget(
+                title: "No Habit",
+                text: "Click the add button to add a habit",
+                ctaText: "Add a Habit",
+                onPressCta: () {
+                  showModalBottomSheet(
+                    isScrollControlled: true,
+                    isDismissible: true,
+                    context: context, 
+                    builder: (context) {
+                      return const AddTaskScreen();
+                    },
+                  );
+                }, 
+                showCta: true,
               )
             : Container(),
 
           ( _isLoadingTasks )
-            ? 
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: 120
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20, horizontal: 10,
-                ),
-                decoration: const BoxDecoration(
-                  // color: Colors.brown[200],
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Column(
-                  children: [
-
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 12),
-
-                    Text(
-                      "Loading Tasks", 
-                      style: Theme.of(context).textTheme.headline5!.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              )
+            ? ContentLoadingWidget(text: "Loading Tasks")
             : Container(),
 
           const SizedBox(height: 40),
           GridView(
-            physics: ScrollPhysics(),
+            physics: const ScrollPhysics(),
             primary: true,
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -247,12 +195,12 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
                           actions: [
                             TextButton(
                               onPressed: ()=> Navigator.pop(ctx), 
-                              child: Text("Cancel"),
+                              child: const Text("Cancel"),
                             ),
                             FloatingActionButton.extended(
-                              key: Key("Delete Task FAB"),
+                              key: const Key("Delete Task FAB"),
                               onPressed: ()=> _deleteTask(task, ctx), 
-                              label: Text("Delete"),
+                              label: const Text("Delete"),
                             ),
                           ],
                         );
@@ -278,17 +226,12 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
           ),
           const SizedBox(height: 120),
 
-
         ],
       ),
     );
   }
 
   
-
-  Future<void> _logOut() async {
-    FirebaseAuth.instance.signOut();
-  }
   
   _getTasks() async {
     setState(()=> _isLoadingTasks = true);
