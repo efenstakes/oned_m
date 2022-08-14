@@ -331,6 +331,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   }
 
 
+
+
   
   void updateProgressTo(double val) {
     Timer.periodic(
