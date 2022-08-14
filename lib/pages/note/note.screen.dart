@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:oned_m/models/note.model.dart';
@@ -13,9 +14,19 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
+
+  Note? _note;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getNote(widget.note.id!);
+  }
+
   @override
   Widget build(BuildContext context) {
-    Note note = widget.note;
+    Note note = _note ?? widget.note;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,4 +59,26 @@ class _NoteScreenState extends State<NoteScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
+
+  _getNote(String id) async {
+    try {
+      await FirebaseFirestore.instance
+        .collection("notes")
+        .doc(id)
+        .get()
+        .then((snapshot) {
+          
+          if( snapshot.exists ) {
+            setState(()=> _note = Note.fromMap(snapshot.data()!));  
+          }
+          
+        });
+        
+    } catch (e) {
+      print("error getting note id ${widget.note.id} ${e.toString()}");
+    }
+    
+  }
+
+
 }
