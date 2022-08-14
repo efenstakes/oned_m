@@ -152,12 +152,17 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
     try {
       var noteRef = FirebaseFirestore.instance.collection("notes").doc();
 
-      await noteRef.set({
+      noteRef.set({
         'id': noteRef.id,
         'title': title,
         'note': note,
         'user': FirebaseAuth.instance.currentUser?.uid,
+      }).then((value) {
+        if ( widget.isInScreen ) {
+          Navigator.of(context).pop();
+        }
       });
+
     } catch (e) {
       if (kDebugMode) {
         print("Failed to Save Note ${e.toString()}");
