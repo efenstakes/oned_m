@@ -53,7 +53,9 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    int taskNumber = (screenSize.width / 320).toInt();
+    
+    int divider = (screenSize.width < 600) ? 1 : ( screenSize.width > 600 && screenSize.width < 1200 ) ? 2 : 2;
+    int taskNumber = screenSize.width ~/ (screenSize.width/divider);
 
 
     return Container(
@@ -178,7 +180,7 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: taskNumber,
-              childAspectRatio: 2.2,
+              childAspectRatio: 3,
             ),
             children: [
               ..._tasks.map((task) { 

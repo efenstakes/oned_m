@@ -56,7 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    int taskNumber = (screenSize.width / 320).toInt();
+    
+    int divider = (screenSize.width < 600) ? 1 : ( screenSize.width > 600 && screenSize.width < 1200 ) ? 2 : 2;
+    int taskNumber = screenSize.width ~/ (screenSize.width/divider);
 
 
     return Container(
@@ -131,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: taskNumber,
-              childAspectRatio: 2.2,
+              childAspectRatio: 3,
             ),
             children: [
               ..._todayTasks.map((task) { 
@@ -234,6 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
            
           List<Task> tsks = [];
           for (var doc in snapshot.docs) {
+            print("doc.data() ${doc.data()}");
             print("now on doc ${doc.id}");
             Task tk = Task.fromMap(doc.data());
 
@@ -308,6 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
            
           List<Task> tsks = [];
           for (var doc in snapshot.docs) {
+            print("doc.data() ${doc.data()}");
             tsks.add(Task.fromMap(doc.data()));
           }
           
