@@ -33,7 +33,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
 
 
-  Task _task = Task( repeats: [], tags: [], project: "Learner" );
+  Task _task = Task( title: "", description: "", repeats: [], tags: [], project: "Learner" );
 
 
   bool _isLoading = false;
@@ -138,7 +138,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   prefixIcon: Icon(Icons.info),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty || value.length < 3) {
+                  if (value == null || value.isEmpty || value.length < 2) {
                     return 'Please enter project';
                   }
                   return null;
@@ -467,53 +467,76 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   _addTask(BuildContext context) async {
     _formKey.currentState!.save();
 
+
     if( !_formKey.currentState!.validate() ) {
       print("form error ");
+      print("_task.title is ${_task.title}");  
+      print("_titleInputController.title is ${_titleInputController.text}");    
+      print("_task.toMap( ) ${_task.toMap()}");
       return;
     }
 
     print("form can submit");
     print("_task start ${_task.startDate.toString()}");
-    print(_task.toMap());
+    print("_task.toMap( ) ${_task.toMap()}");
 
-    setState(() {
-      _isLoading = true;
-      _error = "";
-    });
+    print("_task.title is ${_task.title}");  
+    print("_titleInputController.title is ${_titleInputController.text}");    
+    
+    print("_task.description is ${_task.description}");  
+    print("_titleInputController.description is ${_descriptionInputController.text}");    
+    
+
+    // setState(() {
+    //   _isLoading = true;
+    //   _error = "";
+    // });
 
     try {
       var taskRef = FirebaseFirestore.instance.collection("tasks").doc();
 
-      await taskRef.set({
+
+      String title = _titleInputController.text;
+      String description = _descriptionInputController.text;
+
+
+      taskRef.set({
         ..._task.toMap(),
+        "title": title,
+        "description": description,
         "id": taskRef.id,
         'user': FirebaseAuth.instance.currentUser?.uid,
-      });
+      }).then((value) {
 
-      if( _task.repeatTime != null ) {
-            try {
-              // Create an alarm for the time given
-              int hr = int.parse( _task.repeatTime!.split(":")[0] );
-              int min = int.parse( _task.repeatTime!.split(":")[1] );
-              FlutterAlarmClock.createAlarm(hr, min, title: _task.title!);
-            } catch (e) {
-              print("ERROR FlutterAlarmClock.createAlarm(23, 59); ${e.toString()}");
-            }
-      }
+        if( _task.repeatTime != null ) {
+
+          try {
+            // Create an alarm for the time given
+            int hr = int.parse( _task.repeatTime!.split(":")[0] );
+            int min = int.parse( _task.repeatTime!.split(":")[1] );
+            FlutterAlarmClock.createAlarm(hr, min, title: _task.title!);
+          } catch (e) {
+            print("ERROR FlutterAlarmClock.createAlarm(23, 59); ${e.toString()}");
+          }
+
+        }
+        
+        Fluttertoast.showToast(
+          msg: "Habit Added Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green[700],
+          textColor: Colors.white,
+          fontSize: 16.0
+        );
+        Future.delayed(
+          const Duration(milliseconds: 5500),
+          ()=> Navigator.of(context).pop(),
+        );
+
+      });
       
-      Fluttertoast.showToast(
-        msg: "Habit Added Successfully",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green[700],
-        textColor: Colors.white,
-        fontSize: 16.0
-      );
-      await Future.delayed(
-        const Duration(milliseconds: 5500),
-        ()=> Navigator.of(context).pop(),
-      );
     } catch(e) {
       setState(() {
         _error = "Error adding task";
