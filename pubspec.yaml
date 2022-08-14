@@ -49,6 +49,7 @@ dependencies:
   time_pickerr: ^1.0.6
   salomon_bottom_bar: ^3.3.1
   rich_editor: ^0.0.5
+  flutter_html: ^2.2.1
 
 dev_dependencies:
   flutter_test:
