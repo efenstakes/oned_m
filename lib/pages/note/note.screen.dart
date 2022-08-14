@@ -20,8 +20,15 @@ class _NoteScreenState extends State<NoteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(note.title!),
+        backgroundColor: Colors.grey[100],
+        foregroundColor: Colors.brown,
+        elevation: 0,
       ),
-      body: SizedBox.expand(
+      body: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 16,
+        ),
         child: Html(data: note.text!),
       ),
       floatingActionButton: FloatingActionButton(
