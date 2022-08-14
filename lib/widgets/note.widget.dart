@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
+// import 'package:flutter_native_html_view/flutter_native_html_view.dart';
 import 'package:oned_m/models/note.model.dart';
-import 'package:oned_m/models/task.model.dart';
-import 'package:oned_m/pages/task_details/task_details.screen.dart';
+import 'package:flutter_html/flutter_html.dart';
+
 
 
 class NoteWidget extends StatefulWidget {
@@ -46,13 +46,13 @@ class _NoteWidgetState extends State<NoteWidget> {
                 ),
               ),
               const SizedBox(height: 6),
-                  
+              
               // note
-              Text(
-                widget.note.text!,
-                style: Theme.of(context).textTheme.bodyLarge,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 3,
+              LimitedBox(
+                maxHeight: 64,
+                child: Html(
+                  data: widget.note.text!
+                ),
               ),
 
             ],
