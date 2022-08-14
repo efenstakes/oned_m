@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:oned_m/models/note.model.dart';
 import 'package:oned_m/pages/add_note/add_note.screen.dart';
 import 'package:oned_m/widgets/content_loading.widget.dart';
@@ -36,7 +34,8 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    int noteNumber = screenSize.width ~/ 320;
+    int divider = (screenSize.width < 600) ? 1 : ( screenSize.width > 600 && screenSize.width < 1200 ) ? 2 : 2;
+    int noteNumber = screenSize.width ~/ (screenSize.width/divider);
 
 
     return ListView(
@@ -99,6 +98,7 @@ class _NotesScreenState extends State<NotesScreen> {
            
           List<Note> nts = [];
           for (var doc in snapshot.docs) {
+            print("Note doc.data() ${doc.data()}");
             nts.add(Note.fromMap(doc.data()));
           }
           
