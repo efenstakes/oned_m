@@ -1,11 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:date_time_picker/date_time_picker.dart';
-import 'package:jiffy/jiffy.dart';
 
 
 
@@ -45,7 +39,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           child: ListView(
             children: [
 
-              const SizedBox(height: 80),
+              // const SizedBox(height: 80),
 
               // title
               Text(
