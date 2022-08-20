@@ -55,6 +55,7 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
 
     return Scaffold(
       body: Container(
+        alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
         ),
@@ -64,11 +65,11 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
         child: ListView(
           children: [
 
-            SizedBox(height: screenSize.height/10),
+            // SizedBox(height: screenSize.height/10),
             // title
             Center(
               child: Text(
-                task?.title ?? "Concentrate",
+                task?.title ?? "Focus",
                 style: Theme.of(context).textTheme.headline2!.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white70,
@@ -94,7 +95,7 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
                 )
               ),
             ),
-            SizedBox(height: screenSize.height/6),
+            SizedBox(height: screenSize.height/8),
             
             ValueListenableBuilder(
               valueListenable: _progressNofier, 
@@ -135,9 +136,7 @@ class _TaskOngoingScreenState extends State<TaskOngoingScreen> {
                 );
               }
             ),
-            
-
-            const SizedBox(height: 40),
+            // const SizedBox(height: 32),
 
       
             // AirCircularStateProgressIndicator(
